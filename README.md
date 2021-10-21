@@ -1,4 +1,4 @@
-# m1XSoM3
+# mixsome
 
 ## Run app locally
 ```
