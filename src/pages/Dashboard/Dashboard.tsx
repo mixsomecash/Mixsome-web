@@ -55,7 +55,7 @@ const Dashboard = () => {
         <div className="text-14 leading-14 font-sans xl:text-16 xl:leading-20 mb-4 opacity-60">
           Net worth
         </div>
-        <div className="text-20 leading-14 font-sans xl:text-22 xl:leading-20">10,000 $</div>
+        <div className="text-20 leading-14 font-mono xl:text-22 xl:leading-20">10,000 $</div>
       </div>
     )
   }

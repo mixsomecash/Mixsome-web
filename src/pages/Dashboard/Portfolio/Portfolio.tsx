@@ -82,16 +82,28 @@ const Portfolio = ({ networkId }: Props) => {
                 <img className="w-full h-full" src={coin.imageUrl} alt="" />
               </div>
             </div>
-            <div className="w-2/4 px-3">{coin.name}</div>
+            <div className="w-2/4 px-3 text-14 xl:text-16">{coin.name}</div>
             <div className="w-1/4 mr-5">
-              <span className="opacity-40 mx-3">{coin.symbol.toUpperCase()}</span>
+              <span className="opacity-40 text-14 xl:text-16 mx-2">
+                {coin.symbol.toUpperCase()}
+              </span>
             </div>
           </div>
         </td>
-        <td>$ {coin.price.toFixed(2)}</td>
-        <td>{coin.balance}</td>
-        <td>-</td>
-        <td>$ {(coin.price * coin.balance).toFixed(2)}</td>
+        <td>
+          <span className="font-mono text-14 xl:text-16">$ {coin.price.toFixed(2)}</span>
+        </td>
+        <td>
+          <span className="font-mono text-14 xl:text-16">{coin.balance}</span>
+        </td>
+        <td>
+          <span className="font-mono text-14 xl:text-16">-</span>
+        </td>
+        <td>
+          <span className="font-mono text-14 xl:text-16">
+            $ {(coin.price * coin.balance).toFixed(2)}
+          </span>
+        </td>
         <td>
           <div className="flex justify-center">
             <Button
@@ -168,22 +180,22 @@ const Portfolio = ({ networkId }: Props) => {
           <thead className="border-b border-black border-opacity-20 pb-10">
             <tr>
               <td className="sticky-col pr-4">
-                <span className="opacity-60 text-14 xl:text-18">Token</span>
+                <span className="opacity-60 text-14 xl:text-16">Token</span>
               </td>
               <td className="pr-4">
-                <span className="opacity-60 text-14 xl:text-18">Price</span>
+                <span className="opacity-60 text-14 xl:text-16">Price</span>
               </td>
               <td className="pr-4">
-                <span className="opacity-60 text-14 xl:text-18">Balance</span>
+                <span className="opacity-60 text-14 xl:text-16">Balance</span>
               </td>
               <td className="pr-4">
-                <span className="opacity-60 text-14 xl:text-18">Liquidity</span>
+                <span className="opacity-60 text-14 xl:text-16">Liquidity</span>
               </td>
               <td className="pr-4">
-                <span className="opacity-60 text-14 xl:text-18">Total Balance</span>
+                <span className="opacity-60 text-14 xl:text-16">Total Balance</span>
               </td>
               <td className="text-center">
-                <span className="opacity-60 text-14 xl:text-18">Action</span>
+                <span className="opacity-60 text-14 xl:text-16">Action</span>
               </td>
             </tr>
           </thead>
