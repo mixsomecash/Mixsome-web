@@ -162,3 +162,19 @@ tbody td {
   @apply text-14 lg:text-18 font-sans;
 }
 
+.scrollable-table-wrapper {
+  position: relative;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.scrollable-table-wrapper table .sticky-col {
+  position: -webkit-sticky;
+  position: sticky;
+  background-color: #fff;
+
+  z-index: 1;
+  width: auto;
+  left: 0px;
+}
+
