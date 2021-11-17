@@ -1,6 +1,6 @@
 export type IconOption = {
-  value: string
+  key: string
   label: string
   icon: JSX.Element
-  onClick: () => void
+  onClick: (option: IconOption) => void
 }
