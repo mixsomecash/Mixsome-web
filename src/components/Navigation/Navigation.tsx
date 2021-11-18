@@ -95,7 +95,7 @@ const Navigation = () => {
 
   const renderChainsDropdown = () => {
     return (
-      <div className="mx-3">
+      <div className="hidden xl:block mx-3">
         <ChainsDropdown />
       </div>
     )
@@ -141,6 +141,14 @@ const Navigation = () => {
             ) : (
               <Button text="Connect to wallet" invert fullWidth onClick={handleConnectClick} />
             )}
+          </div>
+
+          <div className="mx-5 pt-10">
+            <div className="grid grid-cols-2">
+              <div>
+                <ChainsDropdown />
+              </div>
+            </div>
           </div>
         </div>
       </div>

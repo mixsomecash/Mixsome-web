@@ -27,7 +27,7 @@ const ChainsDropdown = () => {
     {
       key: '0x1',
       icon: renderCurrencyIcon(Currency.Ether),
-      label: 'Ether',
+      label: 'Ethereum',
       onClick: handleOptionClick,
     },
     {

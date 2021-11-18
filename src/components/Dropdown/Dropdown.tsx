@@ -3,6 +3,9 @@ import ReactSelect, { ValueContainerProps, OptionProps, components } from 'react
 import { IconOption } from './types'
 import DropdownIconOption from './DropdownIconOption'
 
+const PRIMARY_COLOR = '#01F06F'
+const SECONDARY_COLOR = '#E6E6E6'
+
 const { ValueContainer, Option } = components
 
 type Props = {
@@ -55,6 +58,16 @@ const Dropdown = ({ options, selectedOptionKey }: Props) => {
         ValueContainer: DropdownValueContainer,
         SingleValue: () => null,
       }}
+      theme={theme => ({
+        ...theme,
+        borderRadius: 0,
+        colors: {
+          ...theme.colors,
+          primary50: SECONDARY_COLOR,
+          primary25: SECONDARY_COLOR,
+          primary: PRIMARY_COLOR,
+        },
+      })}
     />
   )
 }

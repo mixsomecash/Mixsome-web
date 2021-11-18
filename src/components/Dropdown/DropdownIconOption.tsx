@@ -8,7 +8,7 @@ type Props = {
 const DropdownIconOption = ({ option }: Props) => (
   <div className="py-2 flex items-center">
     <div className="flex-1">{option.icon}</div>
-    <div className="flex-1">{option.label}</div>
+    <div className="flex-1 text-black">{option.label}</div>
   </div>
 )
 

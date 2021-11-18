@@ -14,7 +14,6 @@ const useChain = () => {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId }],
       })
-      app.setChainId(chainId)
     } catch (switchError: any) {
       if (switchError.code === CHAIN_DOES_NOT_EXIST_ERROR_CODE) {
         try {
@@ -36,7 +35,6 @@ const useChain = () => {
               },
             ],
           })
-          app.setChainId(chainId)
         } catch (addError: any) {
           alert(addError.message)
         }
