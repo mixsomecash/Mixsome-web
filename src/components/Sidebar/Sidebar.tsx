@@ -48,6 +48,7 @@ const Sidebar = () => {
     const classes = classNames(
       'w-full border-b silver-border py-4 pr-5 px-5 lg:px-10 lg:pr-10 text-14 lg:text-16 font-regular',
       { 'pl-10 lg:pl-14 bg-silver': isActive },
+      { 'dex-nav': name === 'DEX' },
     )
 
     return (
@@ -70,6 +71,7 @@ const Sidebar = () => {
             {renderComingSoonBadge()}
           </div>
           {renderLink('Flows', '/')}
+          {renderLink('DEX', '/1inch')}
         </nav>
         <div className="hidden lg:block mt-auto mx-5 mb-32 pb-5">
           {renderSocialLinks()}
