@@ -7,6 +7,7 @@ import { getAccountData } from 'clients/ethereum'
 import { config } from 'config'
 
 import NavigationInfo from './NavigationInfo'
+import ChainsDropdown from './ChainsDropdown'
 import { AppContext } from '../../AppContext'
 
 const Navigation = () => {
@@ -92,6 +93,14 @@ const Navigation = () => {
     )
   }
 
+  const renderChainsDropdown = () => {
+    return (
+      <div className="hidden xl:block mx-3">
+        <ChainsDropdown />
+      </div>
+    )
+  }
+
   const renderBurger = () => {
     return (
       <button className="xl:hidden ml-6" type="button" onClick={handleBurgerIconClick}>
@@ -133,6 +142,14 @@ const Navigation = () => {
               <Button text="Connect to wallet" invert fullWidth onClick={handleConnectClick} />
             )}
           </div>
+
+          <div className="mx-5 pt-10">
+            <div className="grid grid-cols-2">
+              <div>
+                <ChainsDropdown />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -144,6 +161,7 @@ const Navigation = () => {
         <nav className="mx-5 xl:mx-10 flex items-center flex-1">
           {renderLogo()}
           {renderStats()}
+          {renderChainsDropdown()}
           {renderUserInfo()}
           {renderBurger()}
         </nav>
