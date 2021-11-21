@@ -1,6 +1,6 @@
 export enum DashboardTab {
   Portfolio = 1,
-  NTFs = 2,
+  NFTs = 2,
   History = 3,
   Defi = 4,
 }
