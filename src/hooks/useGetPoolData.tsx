@@ -43,8 +43,8 @@ const useGetPoolData = (address: string) => {
   const stakeSome = async (amount: number) => {
     // if (!contract) return
     setIsloading(true)
-    const dex = user.get('ethAddress')
-    const dex1 = web3.utils.toChecksumAddress(dex)
+    const dex = user!.get('ethAddress')
+    const dex1 = web3!.utils.toChecksumAddress(dex)
     console.log(dex1)
     const connector = await Moralis.Web3.enable()
     const pool = new connector.eth.Contract(tokenContractAbi as AbiItem[], address)
@@ -56,8 +56,8 @@ const useGetPoolData = (address: string) => {
   }
 
   const getAddress = async () => {
-    const dex = user.get('ethAddress')
-    const dex1 = web3.utils.toChecksumAddress(dex)
+    const dex = user!.get('ethAddress')
+    const dex1 = web3!.utils.toChecksumAddress(dex)
     console.log(dex1)
     setAddress(dex1)
   }

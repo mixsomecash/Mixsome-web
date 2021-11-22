@@ -9,7 +9,6 @@ type Props = {
 }
 
 const InvestInput = ({ onValueChange }: Props) => {
-  // const { getSmth } = useTemp()
   const { account } = useContext(AppContext)
 
   const handleInvestValueChange = (event: FormEvent<HTMLInputElement>) => {

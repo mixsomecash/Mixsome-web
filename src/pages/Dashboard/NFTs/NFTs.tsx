@@ -34,7 +34,7 @@ const NFTs = ({ networkId }: Props) => {
       console.log(await user!.attributes.ethAddress)
       const response = await Moralis.Web3.getNFTs({
         chain: '0x1',
-        address: await user!.attributes.ethAddress,gi
+        address: await user!.attributes.ethAddress,
       })
       console.log(response)
 
@@ -54,11 +54,11 @@ const NFTs = ({ networkId }: Props) => {
       if (!response) return
 
       const mergedNFTsData = response.map(nft => {
-        const data = response.filter(
-          NFTData => NFTData.name.replace(/ .*/, '').toLowerCase() === nft.name.toLowerCase(),
-        )[0]
+        // const data = response.filter(
+        //   NFTData => NFTData.name.replace(/ .*/, '').toLowerCase() === nft.name.toLowerCase(),
+        // )[0]
 
-        if (!data) return null
+        // if (!data) return null
 
         return {
           contract_type: nft.contract_type,
@@ -70,7 +70,7 @@ const NFTs = ({ networkId }: Props) => {
         }
       })
 
-      setNFTs(mergedNFTsData)
+      // setNFTs(mergedNFTsData)
 
       setIsloading(false)
     }

@@ -15,6 +15,13 @@ type Coin = {
   balance: number
 }
 
+type Data = {
+  name: string
+  symbol: string
+  balance: number
+  decimals: number
+}
+
 type Props = {
   networkId: DashboardNetwork
 }
@@ -29,19 +36,21 @@ const Portfolio = ({ networkId }: Props) => {
   const { data: tokensData, isLoading: isTokensLoading } = useMoralisCloudFunction('getTokens', {
     userAddress,
   })
+  const tokens = tokensData as Data
 
   useEffect(() => {
     const fetchData = async () => {
       setIsloading(true)
 
-      const tokenNames = tokensData.map(token => token.name.replace(/ .*/, '').toLowerCase())
+      // TODO implement right interface for tokens
+      const tokenNames = tokens.map(token => token.name.replace(/ .*/, '').toLowerCase())
 
       const response = await getCoinData(tokenNames)
 
       if (!response?.data) return
 
       const mergedCoinData = response.data.map(coin => {
-        const data = tokensData.filter(
+        const data = tokens.filter(
           tokenData => tokenData.name.replace(/ .*/, '').toLowerCase() === coin.name.toLowerCase(),
         )[0]
 
@@ -61,10 +70,10 @@ const Portfolio = ({ networkId }: Props) => {
       setIsloading(false)
     }
 
-    if (isTokensLoading || !tokensData.length) return
+    if (isTokensLoading || !tokens.length) return
 
     fetchData()
-  }, [isTokensLoading, tokensData, networkId])
+  }, [isTokensLoading, tokens, networkId])
 
   const handleSearchChange = (event: FormEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget
