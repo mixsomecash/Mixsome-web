@@ -31,7 +31,7 @@ const Pool = ({ pool, onLockClick, onUnlockClick, totalLiquidity }: Props) => {
     const [address, setAddress] = useState()
     useEffect(() => {
       if (isAuthenticated) {
-        setAddress(user.attributes.ethAddress)
+        setAddress(user?.attributes.ethAddress)
         console.log(address)
       }
     }, [address])

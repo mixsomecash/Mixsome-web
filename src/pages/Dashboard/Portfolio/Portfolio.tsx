@@ -15,7 +15,7 @@ type Coin = {
   balance: number
 }
 
-type Data = {
+type Tokens = {
   name: string
   symbol: string
   balance: number
@@ -36,7 +36,7 @@ const Portfolio = ({ networkId }: Props) => {
   const { data: tokensData, isLoading: isTokensLoading } = useMoralisCloudFunction('getTokens', {
     userAddress,
   })
-  const tokens = tokensData as Data
+  const tokens = tokensData as Tokens[]
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,7 +70,7 @@ const Portfolio = ({ networkId }: Props) => {
       setIsloading(false)
     }
 
-    if (isTokensLoading || !tokens.length) return
+    if (isTokensLoading || !tokens?.length) return
 
     fetchData()
   }, [isTokensLoading, tokens, networkId])
