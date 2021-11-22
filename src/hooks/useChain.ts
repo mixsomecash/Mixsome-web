@@ -1,40 +1,38 @@
-import { useContext } from 'react'
 import { networkConfigs } from 'utils/networks'
-import { AppContext } from 'AppContext'
+import { useMoralis } from 'react-moralis'
 
-const CURRENCY_DECIMALS = 18
 const CHAIN_DOES_NOT_EXIST_ERROR_CODE = 4902
 
 const useChain = () => {
-  const app = useContext(AppContext)
-
-  const switchNetwork = async (chainId: string) => {
+  const { Moralis, isWeb3Enabled } = useMoralis()
+  const switchNetwork = async (chainIdString: string) => {
     try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId }],
-      })
+      if (!isWeb3Enabled) {
+        await Moralis.Web3.enableWeb3()
+      }
+      await Moralis.Web3.switchNetwork(chainIdString)
+      window.location.reload()
     } catch (switchError: any) {
       if (switchError.code === CHAIN_DOES_NOT_EXIST_ERROR_CODE) {
         try {
-          const config = networkConfigs[chainId]
-          const { chainName, currencyName, currencySymbol, rpcUrl, blockExplorerUrl } = config
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId,
-                chainName,
-                nativeCurrency: {
-                  name: currencyName,
-                  symbol: currencySymbol,
-                  decimals: CURRENCY_DECIMALS,
-                },
-                rpcUrls: [rpcUrl],
-                blockExplorerUrls: [blockExplorerUrl],
-              },
-            ],
-          })
+          const config = networkConfigs[chainIdString]
+          const {
+            chainId,
+            chainName,
+            currencyName,
+            currencySymbol,
+            rpcUrl,
+            blockExplorerUrl,
+          } = config
+          await Moralis.Web3.addNetwork(
+            chainId,
+            chainName,
+            currencyName,
+            currencySymbol,
+            rpcUrl,
+            blockExplorerUrl,
+          )
+          window.location.reload()
         } catch (addError: any) {
           alert(addError.message)
         }

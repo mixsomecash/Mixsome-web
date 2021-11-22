@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import ReactSelect, { ValueContainerProps, OptionProps, components } from 'react-select'
 import { IconOption } from './types'
 import DropdownIconOption from './DropdownIconOption'
@@ -10,7 +10,7 @@ const { ValueContainer, Option } = components
 
 type Props = {
   options: IconOption[]
-  selectedOptionKey?: string
+  selectedOptionKey?: string | null
 }
 
 const Dropdown = ({ options, selectedOptionKey }: Props) => {

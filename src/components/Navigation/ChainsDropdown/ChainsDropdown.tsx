@@ -1,18 +1,15 @@
-import React, { useContext } from 'react'
-
+import React from 'react'
+import { useMoralis } from 'react-moralis'
 import { getCurrencyIconFileName } from 'utils/currencyIcon'
 import { Currency } from 'constants/currency'
 import { useChain } from 'hooks'
 import { IconOption } from 'components/Dropdown/types'
-import { AppContext } from 'AppContext'
 import Dropdown from '../../Dropdown'
 import CurrencyIcon from '../../CurrencyIcon'
 
 const ChainsDropdown = () => {
-  const app = useContext(AppContext)
+  const { chainId } = useMoralis()
   const chain = useChain()
-
-  const { chainId: networkId } = app
 
   const renderCurrencyIcon = (currency: Currency) => {
     const iconUrl = `/images/currencies/${getCurrencyIconFileName(currency)}`
@@ -38,7 +35,7 @@ const ChainsDropdown = () => {
     },
   ]
 
-  return <Dropdown options={options} selectedOptionKey={networkId} />
+  return <Dropdown options={options} selectedOptionKey={chainId} />
 }
 
 export default ChainsDropdown
