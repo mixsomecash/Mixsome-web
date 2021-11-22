@@ -18,12 +18,12 @@ const useGetApprovalStatus = (address: string) => {
   const approvalStatus = async () => {
     setIsloading(true)
     const connector = await Moralis.Web3.enable()
-    const senderAddress = user.get('ethAddress')
+    const senderAddress = user!.get('ethAddress')
     // Object.getOwnPropertyNames(balances).forEach(key => {
     //  const value = balances[key]
     //  console.log(balances[key].name)
     // })
-    const dex1 = web3.utils.toChecksumAddress(senderAddress)
+    const dex1 = web3!.utils.toChecksumAddress(senderAddress)
     const pool = new connector.eth.Contract(tokenContractAbi as AbiItem[], address)
     // const value1 = ethers.utils.parseUnits(amount.toString(), 18)
     const tx = await pool.methods

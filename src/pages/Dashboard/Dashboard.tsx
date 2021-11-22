@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Tabs, ToggleButton } from 'components'
 
 import Portfolio from './Portfolio'
-import NTFs from './NTFs'
+import NFTs from './NFTs'
 import History from './History'
 import Defi from './Defi'
 
@@ -15,8 +15,8 @@ const tabs = [
     title: 'Portfolio',
   },
   {
-    id: DashboardTab.NTFs,
-    title: 'NTFs',
+    id: DashboardTab.NFTs,
+    title: 'NFTs',
   },
   {
     id: DashboardTab.History,
@@ -79,8 +79,8 @@ const Dashboard = () => {
     switch (activeTabId) {
       case DashboardTab.Portfolio:
         return <Portfolio networkId={selectedNetworkId} />
-      case DashboardTab.NTFs:
-        return <NTFs networkId={selectedNetworkId} />
+      case DashboardTab.NFTs:
+        return <NFTs networkId={selectedNetworkId} />
       case DashboardTab.History:
         return <History networkId={selectedNetworkId} />
       case DashboardTab.Defi:
@@ -102,7 +102,6 @@ const Dashboard = () => {
   return (
     <>
       {renderNetWorth()}
-      {renderNetwork()}
       {renderTabs()}
     </>
   )

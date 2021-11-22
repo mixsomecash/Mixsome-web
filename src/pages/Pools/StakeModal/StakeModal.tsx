@@ -19,7 +19,6 @@ const StakeModal = ({ isVisible, address, crypto, onClose }: Props) => {
   const { approvalGet } = useGetApproval(address!, crypto!)
   const { stakeSome } = useGetPoolData(address!)
   const { approvalStatus } = useGetApprovalStatus(crypto!)
-  // const { getSmth } = useTemp()
   const { account } = useContext(AppContext)
 
   const handleApproveButtonClick = () => {

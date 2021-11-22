@@ -182,3 +182,10 @@ tbody td {
 .dex-nav {
   font-weight: 900;
 }
+.dropdown {
+  min-width: 200px;
+}
+
+.dropdown__singleValue {
+  grid-area: 1/1/2/3;
+}
