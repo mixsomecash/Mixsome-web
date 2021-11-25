@@ -1,5 +1,8 @@
 export const networkConfigs = {
   '0x1': {
+    chainId: 1,
+    chainName: 'Ethereum Mainnet',
+    currencyName: 'ETH',
     currencySymbol: 'ETH',
     blockExplorerUrl: 'https://etherscan.io/',
     wrapped: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -14,3 +17,5 @@ export const networkConfigs = {
     wrapped: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
   },
 }
+
+export const getExplorer = (chain: string) => networkConfigs[chain]?.blockExplorerUrl

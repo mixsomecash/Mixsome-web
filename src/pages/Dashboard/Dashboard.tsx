@@ -82,7 +82,7 @@ const Dashboard = () => {
       case DashboardTab.NFTs:
         return <NFTs networkId={selectedNetworkId} />
       case DashboardTab.History:
-        return <History networkId={selectedNetworkId} />
+        return <History />
       case DashboardTab.Defi:
         return <Defi networkId={selectedNetworkId} />
       default:

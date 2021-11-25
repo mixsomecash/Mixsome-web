@@ -20,7 +20,7 @@ const ChainsDropdown = () => {
     await chain.switchNetwork(option.key)
   }
 
-  const options = [
+  const options: IconOption[] = [
     {
       key: '0x1',
       icon: renderCurrencyIcon(Currency.Ether),
