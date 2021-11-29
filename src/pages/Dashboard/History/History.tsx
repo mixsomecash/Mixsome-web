@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useERC20Transfers, useNFTTransfers, useMoralis } from 'react-moralis'
 import { AppContext } from 'AppContext'
-import { Loader } from 'components'
+import { ErrorMessage, Loader } from 'components'
 import { getEllipsisText } from 'utils/formatters'
 import { getExplorer } from 'utils/networks'
 import { GenericTransfer, erc20ToGenericTransfer, nftToGenericTransfer } from './HistoryHelper'
@@ -28,11 +28,7 @@ const History = () => {
   }, [erc20Data, nftData])
 
   if (!isAuthenticated) {
-    return (
-      <div className="text-center">
-        <span className="text-18 opacity-60">Please connect to your wallet...</span>
-      </div>
-    )
+    return <ErrorMessage message="Please connect to your wallet" />
   }
 
   const columns = [
