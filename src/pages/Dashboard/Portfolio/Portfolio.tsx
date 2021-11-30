@@ -1,42 +1,36 @@
-import React, { FormEvent, useState, useEffect, useMemo } from 'react'
-import { useMoralis, useERC20Balances, useNativeBalance } from 'react-moralis'
+import React, { FormEvent, useState, useEffect } from 'react'
+import { useMoralis } from 'react-moralis'
 import { ErrorMessage, Loader } from 'components'
-import { useCoinGecko } from 'hooks'
-import {
-  nativeTokenBalanceToGenericBalance as nativeBalanceToGenericBalance,
-  GenericTokenBalance,
-  tokenBalancesToGenericBalances,
-} from './PortfolioHelper'
+import { ChainAddress } from 'types/literals/chainAddress'
+import { GenericTokenBalance, getTokenBalances, getUsdBalance } from './PortfolioHelper'
 
-const Portfolio = () => {
-  const { data: nativeTokenBalance, nativeToken, isLoading: isLoadingNative } = useNativeBalance()
-  const { data: tokenBalances, isLoading: isLoadingTokens } = useERC20Balances()
-  const { Moralis, isAuthenticated } = useMoralis()
-  const { coins } = useCoinGecko()
+type Props = {
+  onLoad?: (netWorth: number | string) => void
+}
 
+const Portfolio = ({ onLoad }: Props) => {
+  const { Moralis, isAuthenticated, account, chainId } = useMoralis()
+
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [allTokenBalances, setAllTokenBalances] = useState<GenericTokenBalance[] | null>(null)
-
-  const isLoading = isLoadingNative || isLoadingTokens
+  const [tokenBalances, setTokenBalances] = useState<GenericTokenBalance[] | null>(null)
 
   useEffect(() => {
-    if (!tokenBalances || !nativeToken || !nativeTokenBalance?.balance || !coins) {
+    if (!account || !chainId) {
       return
     }
-
-    const genericNativeBalance = nativeBalanceToGenericBalance(
-      nativeToken,
-      nativeTokenBalance?.balance,
-      coins,
-    )
-    const genericTokenBalances = tokenBalancesToGenericBalances(tokenBalances, coins)
-
-    if (!genericNativeBalance || !genericTokenBalances) {
-      return
-    }
-
-    setAllTokenBalances([genericNativeBalance, ...genericTokenBalances])
-  }, [tokenBalances, nativeToken, nativeTokenBalance?.balance, coins])
+    ;(async () => {
+      setIsLoading(true)
+      const balances = await getTokenBalances(account, chainId as ChainAddress)
+      setTokenBalances(balances)
+      if (onLoad && balances) {
+        onLoad(
+          balances.reduce((acc, tokenBalance) => getUsdBalance(tokenBalance) + acc, 0).toFixed(2),
+        )
+      }
+      setIsLoading(false)
+    })()
+  }, [account, chainId, onLoad])
 
   if (!isAuthenticated) {
     return <ErrorMessage message="Please connect to your wallet" />
@@ -48,11 +42,11 @@ const Portfolio = () => {
   }
 
   const getFilteredBalances = () => {
-    if (!allTokenBalances) {
+    if (!tokenBalances) {
       return null
     }
 
-    return allTokenBalances.filter(
+    return tokenBalances.filter(
       balance =>
         balance.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         balance.symbol.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -80,18 +74,23 @@ const Portfolio = () => {
     {
       title: 'Symbol',
       key: 'symbol',
-      render: (item: GenericTokenBalance) => item.symbol,
+      render: (item: GenericTokenBalance) => item.symbol.toUpperCase(),
     },
     {
       title: 'Price',
       key: 'price',
-      render: (item: GenericTokenBalance) => item.price,
+      render: (item: GenericTokenBalance) => `$${item.price.toFixed(4)}`,
+    },
+    {
+      title: 'Amount',
+      key: 'amount',
+      render: (item: GenericTokenBalance) =>
+        Moralis.Units.FromWei(item.amount, item.decimals).toFixed(4),
     },
     {
       title: 'Balance',
       key: 'balance',
-      render: (item: GenericTokenBalance) =>
-        parseFloat(Moralis.Units.FromWei(item.balance, item.decimals).toFixed(6)),
+      render: (item: GenericTokenBalance) => `$${getUsdBalance(item).toFixed(2)}`,
     },
   ]
 
