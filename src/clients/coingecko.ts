@@ -16,21 +16,13 @@ export type CoinGeckoMarketCoin = {
 }
 
 export const getCoinsList = async (): Promise<CoinGeckoCoin[] | null> => {
-  try {
-    const response = await axios.get(`${config.coingecko.url}/coins/list`)
-    return response.data
-  } catch (ex) {
-    return null
-  }
+  const response = await axios.get(`${config.coingecko.url}/coins/list`).catch(() => null)
+  return response?.data
 }
 
 export const getCoinsMarkets = async (ids: string[]): Promise<CoinGeckoMarketCoin[] | null> => {
-  try {
-    const response = await axios.get(
-      `${config.coingecko.url}/coins/markets?vs_currency=usd&ids=${ids.join(',')}`,
-    )
-    return response.data
-  } catch (ex) {
-    return null
-  }
+  const response = await axios
+    .get(`${config.coingecko.url}/coins/markets?vs_currency=usd&ids=${ids.join(',')}`)
+    .catch(() => null)
+  return response?.data
 }

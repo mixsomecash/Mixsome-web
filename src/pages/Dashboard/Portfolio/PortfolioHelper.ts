@@ -80,10 +80,12 @@ export const getTokenBalances = async (
   const erc20BalancesWithPrices = await Promise.all(
     erc20TokenBalances.map(
       async (token): Promise<GenericTokenBalance> => {
-        const price = await Moralis.Web3API.token.getTokenPrice({
-          address: token.token_address,
-          chain: chainId as '0x1' | '0x38',
-        })
+        const tokenPrice = await Moralis.Web3API.token
+          .getTokenPrice({
+            address: token.token_address,
+            chain: chainId as '0x1' | '0x38',
+          })
+          .catch(() => null)
 
         return {
           address: token.token_address,
@@ -96,7 +98,7 @@ export const getTokenBalances = async (
           symbol: token.symbol,
           decimals: Number(token.decimals),
           amount: token.balance,
-          price: price?.usdPrice || 0,
+          price: tokenPrice?.usdPrice || 0,
         }
       },
     ),
