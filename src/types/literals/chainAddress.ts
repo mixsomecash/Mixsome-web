@@ -1,0 +1,1 @@
+export type ChainAddress = '0x1' | '0x38'

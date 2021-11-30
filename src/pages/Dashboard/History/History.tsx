@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useERC20Transfers, useNFTTransfers, useMoralis } from 'react-moralis'
 import { AppContext } from 'AppContext'
-import { Loader } from 'components'
+import { ErrorMessage, Loader } from 'components'
 import { getEllipsisText } from 'utils/formatters'
 import { getExplorer } from 'utils/networks'
 import { GenericTransfer, erc20ToGenericTransfer, nftToGenericTransfer } from './HistoryHelper'
@@ -9,8 +9,10 @@ import { GenericTransfer, erc20ToGenericTransfer, nftToGenericTransfer } from '.
 const History = () => {
   const { account } = useContext(AppContext)
   const { Moralis, chainId, isAuthenticated } = useMoralis()
-  const { data: erc20Data } = useERC20Transfers({ address: account?.address })
-  const { data: nftData } = useNFTTransfers({ address: account?.address })
+  const { data: erc20Data, isLoading: isLoadingERC20 } = useERC20Transfers({
+    address: account?.address,
+  })
+  const { data: nftData, isLoading: isLoadingNFT } = useNFTTransfers({ address: account?.address })
 
   const [allTransfers, setAllTransfers] = useState<GenericTransfer[] | null>(null)
 
@@ -28,12 +30,10 @@ const History = () => {
   }, [erc20Data, nftData])
 
   if (!isAuthenticated) {
-    return (
-      <div className="text-center">
-        <span className="text-18 opacity-60">Please connect to your wallet...</span>
-      </div>
-    )
+    return <ErrorMessage message="Please connect to your wallet" />
   }
+
+  const isLoading = isLoadingERC20 || isLoadingNFT
 
   const columns = [
     {
@@ -78,7 +78,8 @@ const History = () => {
         History
       </div>
 
-      {allTransfers &&
+      {!isLoading &&
+        allTransfers &&
         (allTransfers.length > 0 ? (
           <table className="table-auto w-full xl:mt-10">
             <thead className="border-b border-black border-opacity-20 pb-10">
@@ -104,10 +105,14 @@ const History = () => {
           <div className="text-center opacity-60 mt-3">No History</div>
         ))}
 
-      {!allTransfers && (
+      {isLoading && (
         <div className="text-center">
           <Loader />
         </div>
+      )}
+
+      {!isLoading && !allTransfers && (
+        <ErrorMessage message="An error occurred while getting transfers" />
       )}
     </div>
   )

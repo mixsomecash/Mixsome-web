@@ -3,7 +3,7 @@ import { useMoralis } from 'react-moralis'
 import { useGetPoolData, useGetApprovalStatus, useGetTotalStaked, useGetApproval } from 'hooks'
 import { getAccountAddress, getSigner, toEth } from 'clients/ethereum'
 
-import { Button, Loader } from 'components'
+import { Button, ErrorMessage, Loader } from 'components'
 
 import { DashboardNetwork } from '../types'
 
@@ -157,12 +157,9 @@ const NFTs = ({ networkId }: Props) => {
     return filteredCoins.map(renderNFT)
   }
 
-  if (!isAuthenticated)
-    return (
-      <div className="text-center">
-        <span className="text-18 opacity-60">Please connect to your wallet...</span>
-      </div>
-    )
+  if (!isAuthenticated) {
+    return <ErrorMessage message="Please connect to your wallet" />
+  }
 
   return (
     <div className="w-full bg-white px-6 py-4 xl:px-12 xl:py-10">
