@@ -5,13 +5,14 @@ import { ChainAddress } from 'types/literals/chainAddress'
 import { GenericTokenBalance, getTokenBalances, getUsdBalance } from './PortfolioHelper'
 
 type Props = {
-  onLoad?: (netWorth: number | string) => void
+  onNetWorthChange?: (netWorth: number | string) => void
 }
 
-const Portfolio = ({ onLoad }: Props) => {
+const Portfolio = ({ onNetWorthChange }: Props) => {
   const { Moralis, isAuthenticated, account, chainId } = useMoralis()
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [tokenBalances, setTokenBalances] = useState<GenericTokenBalance[] | null>(null)
 
@@ -20,17 +21,23 @@ const Portfolio = ({ onLoad }: Props) => {
       return
     }
     ;(async () => {
+      setErrorMessage(null)
       setIsLoading(true)
       const balances = await getTokenBalances(account, chainId as ChainAddress)
-      setTokenBalances(balances)
-      if (onLoad && balances) {
-        onLoad(
-          balances.reduce((acc, tokenBalance) => getUsdBalance(tokenBalance) + acc, 0).toFixed(2),
-        )
+      if (balances) {
+        setTokenBalances(balances)
+        if (onNetWorthChange) {
+          const netWorth = balances
+            .reduce((acc, tokenBalance) => getUsdBalance(tokenBalance) + acc, 0)
+            .toFixed(2)
+          onNetWorthChange(netWorth)
+        }
+      } else {
+        setErrorMessage('An error occurred while getting balances')
       }
       setIsLoading(false)
     })()
-  }, [account, chainId, onLoad])
+  }, [account, chainId, onNetWorthChange])
 
   if (!isAuthenticated) {
     return <ErrorMessage message="Please connect to your wallet" />
@@ -110,7 +117,7 @@ const Portfolio = ({ onLoad }: Props) => {
         />
       </div>
 
-      {!isLoading && filteredBalances && filteredBalances.length > 0 && (
+      {!isLoading && !errorMessage && filteredBalances && filteredBalances.length > 0 && (
         <div className="scrollable-table-wrapper">
           <table className="table-auto w-full xl:mt-4">
             <thead className="border-b border-black border-opacity-20 pb-10">
@@ -141,9 +148,11 @@ const Portfolio = ({ onLoad }: Props) => {
         </div>
       )}
 
-      {!isLoading && (!filteredBalances || filteredBalances.length === 0) && (
+      {!isLoading && !errorMessage && (!filteredBalances || filteredBalances.length === 0) && (
         <ErrorMessage message="No tokens found" />
       )}
+
+      {errorMessage && <ErrorMessage message={errorMessage} />}
     </div>
   )
 }

@@ -82,7 +82,7 @@ const Dashboard = () => {
   const renderTabContent = () => {
     switch (activeTabId) {
       case DashboardTab.Portfolio:
-        return <Portfolio onLoad={setNetWorth} />
+        return <Portfolio onNetWorthChange={setNetWorth} />
       case DashboardTab.NFTs:
         return <NFTs networkId={selectedNetworkId} />
       case DashboardTab.History:
