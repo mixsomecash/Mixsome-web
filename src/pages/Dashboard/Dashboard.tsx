@@ -24,7 +24,7 @@ const tabs = [
   },
   {
     id: DashboardTab.Defi,
-    title: 'Defi',
+    title: 'DeFi',
   },
 ]
 

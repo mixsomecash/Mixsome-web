@@ -20,6 +20,7 @@ const Portfolio = ({ onNetWorthChange }: Props) => {
     if (!account || !chainId) {
       return
     }
+    // anon func
     ;(async () => {
       setErrorMessage(null)
       setIsLoading(true)
