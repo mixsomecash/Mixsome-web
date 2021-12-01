@@ -1,5 +1,3 @@
-const colors = require('tailwindcss/colors')
-
 module.exports = {
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   darkMode: false, // or 'media' or 'class'
@@ -9,6 +7,7 @@ module.exports = {
       black: '#000000',
       silver: '#FAFAFA',
       light: '#969494',
+      'extra-light': '#e6e6e6',
       green: '#01F06F',
     },
     fontFamily: {
@@ -27,9 +26,11 @@ module.exports = {
       '16': '16px',
       '18': '18px',
       '20': '20px',
+      '24': '24px',
       '32': '32px',
     },
     lineHeight: {
+      '14': '14px',
       '16': '16px',
       '18': '18px',
       '22': '22px',

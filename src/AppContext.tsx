@@ -20,16 +20,15 @@ const AppProvider = ({ children }: Props) => {
   const [account, setAccount] = useState<AccountModel | null>(null)
 
   useEffect(() => {
-    const get = async () => {
+    ;(async () => {
       const accountData = await getAccountData()
-
       setAccount(accountData)
-    }
-
-    get()
+    })()
   }, [])
 
-  return <AppContext.Provider value={{ account, setAccount }}>{children}</AppContext.Provider>
+  const context = { account, setAccount }
+
+  return <AppContext.Provider value={context}>{children}</AppContext.Provider>
 }
 
 export default AppProvider

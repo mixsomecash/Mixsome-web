@@ -51,12 +51,10 @@ const useGetFlowData = (address: string) => {
 
     setIsloading(true)
     const web4 = await Moralis.Web3.enable()
-    const chainIdHex = web4.currentProvider.chainId
     const chainIdDec = await web4.eth.getChainId()
-    console.log(chainIdHex)
     console.log(chainIdDec)
-    const dex = user.get('ethAddress')
-    const dex1 = web3.utils.toChecksumAddress(dex)
+    const dex = user!.get('ethAddress')
+    const dex1 = web3!.utils.toChecksumAddress(dex)
     const contract1 = new web4.eth.Contract(tokenContractAbi as AbiItem[], address)
     const value1 = ethers.utils.parseUnits(amount.toString(), 18)
     const tx = await contract1.methods.deposit(dex1, value1).send({ from: dex1, value: value1 })

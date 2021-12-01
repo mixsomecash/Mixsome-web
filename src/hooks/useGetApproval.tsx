@@ -43,8 +43,8 @@ const useGetApproval = (address: string, crypto: string) => {
     setIsloading(true)
     const connector = await Moralis.Web3.enable()
     const chainIdDec = await connector.eth.getChainId()
-    const senderAddress = user.get('ethAddress')
-    const dex1 = web3.utils.toChecksumAddress(senderAddress)
+    const senderAddress = user!.get('ethAddress')
+    const dex1 = web3!.utils.toChecksumAddress(senderAddress)
     const pool = new connector.eth.Contract(tokenContractAbi as AbiItem[], crypto)
     // const value1 = ethers.utils.parseUnits(amount.toString(), 18)
     if (chainIdDec === 1 && address === '0x3E8FFc8c3Cb0DB3081Df85DeC91B63abBbe99F71') {
