@@ -4730,10 +4730,10 @@ crypto-browserify@3.12.0, crypto-browserify@^3.11.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-crypto-js@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.0.0.tgz#2904ab2677a9d042856a2ea2ef80de92e4a36dcc"
-  integrity sha512-bzHZN8Pn+gS7DQA6n+iUmBfl0hO5DJq++QP3U6uTucDtk/0iGpXd/Gg7CGR0p8tJhofJyaKoWBuJI4eAO00BBg==
+crypto-js@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 crypto-random-string@^1.0.0:
   version "1.0.0"
@@ -9100,10 +9100,10 @@ modern-normalize@^1.1.0:
   resolved "https://registry.yarnpkg.com/modern-normalize/-/modern-normalize-1.1.0.tgz#da8e80140d9221426bd4f725c6e11283d34f90b7"
   integrity sha512-2lMlY1Yc1+CUy0gw4H95uNN7vjbpoED7NNRSBHE25nWfLBdmMzFCsPshlzbxHz+gYMcBEUN8V4pU16prcdPSgA==
 
-moralis@^0.0.134:
-  version "0.0.134"
-  resolved "https://registry.yarnpkg.com/moralis/-/moralis-0.0.134.tgz#fa763b5a480e0e572828d681ade7e0e958e51259"
-  integrity sha512-2+JkbHDOhTzgbAnx6foJ7BwngCvYhNbpjwStvSOjrdX6eWKNT5njyLQtTJlJUaXS7uJSkvtV2frSwEZ78ZnwGQ==
+moralis@^0.0.140:
+  version "0.0.140"
+  resolved "https://registry.yarnpkg.com/moralis/-/moralis-0.0.140.tgz#286098d0c3419524db7bb8fb0c6af5c38714b275"
+  integrity sha512-vNyL6QMs/VybT7w87XEe/YTGp+vbMGtyrvtJvc9FMTXNh9AQhUD0frS/cFVdOa1skMyve1AZGAmZrkrgQM0H2Q==
   dependencies:
     "@babel/runtime" "7.12.5"
     "@babel/runtime-corejs3" "7.12.5"
@@ -9116,7 +9116,7 @@ moralis@^0.0.134:
     ws "^7.4.6"
     xmlhttprequest "1.8.0"
   optionalDependencies:
-    crypto-js "4.0.0"
+    crypto-js "4.1.1"
 
 move-concurrently@^1.0.1:
   version "1.0.1"
