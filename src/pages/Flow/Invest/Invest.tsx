@@ -39,7 +39,7 @@ const Invest = (props: Props) => {
         setPair(pairData)
         const lastReserves = await Moralis.Web3API.defi.getPairReserves({
           pair_address: pairData.pairAddress,
-          chain: '0x38',
+          chain: chainId,
         })
         if (lastReserves) {
           setLastReserve(Number(lastReserves.reserve0) / 10 ** Number(pairData.token0.decimals))
@@ -68,7 +68,7 @@ const Invest = (props: Props) => {
       dates.map(time =>
         Moralis.Web3API.defi.getPairReserves({
           pair_address: pair.pairAddress,
-          chain: '0x38',
+          chain: chainId,
           to_date: `${time}`,
         }),
       ),
