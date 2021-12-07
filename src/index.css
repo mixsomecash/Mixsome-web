@@ -185,3 +185,7 @@ tbody td {
 .dropdown__singleValue {
   grid-area: 1/1/2/3;
 }
+
+.chart__container {
+  height: 400px
+}

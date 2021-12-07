@@ -31,6 +31,7 @@
   "dependencies": {
     "@types/react-modal": "^3.12.1",
     "axios": "^0.21.1",
+    "chart.js": "^3.6.1",
     "classnames": "^2.3.1",
     "ethers": "^5.1.0",
     "moralis": "^0.0.134",
