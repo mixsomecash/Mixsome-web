@@ -1,7 +1,7 @@
 import React, { FormEvent, useState, useEffect } from 'react'
 import { useMoralis } from 'react-moralis'
 import { ErrorMessage, Loader } from 'components'
-import { ChainAddress } from 'types/literals/chainAddress'
+import { ChainAddress } from 'types/moralis'
 import { GenericTokenBalance, getTokenBalances, getUsdBalance } from './PortfolioHelper'
 
 type Props = {

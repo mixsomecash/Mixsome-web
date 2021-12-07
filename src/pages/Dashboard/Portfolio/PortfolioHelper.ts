@@ -1,6 +1,6 @@
 import { CoinGeckoCoin, getCoinsList, getCoinsMarkets } from 'clients/coingecko'
 import { Moralis } from 'moralis'
-import { ChainAddress } from 'types/literals/chainAddress'
+import { ChainAddress } from 'types/moralis'
 import { networkConfigs } from 'utils/networks'
 
 export type GenericTokenBalance = {

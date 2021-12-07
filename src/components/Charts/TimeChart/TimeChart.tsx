@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Loader } from 'components'
+import { Button, ErrorMessage, Loader } from 'components'
 import LineChart from '../LineChart/LineChart'
+import { TimeRecord } from './types'
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000
 const DEFAULT_SELECTED_TIME = '12H'
@@ -23,46 +24,42 @@ const timeButtons: TimeButton[] = [
   },
 ]
 
-type TimeRecord = {
-  date: string
-  value: number
-}
-
 type TimeButton = {
   label: string
   time: number
 }
 
 type Props = {
-  getData: (fromTime: number) => Promise<TimeRecord[]>
+  getData: (fromTime: number) => Promise<TimeRecord[] | null>
   dataLabel: string
 }
 
 const TimeChart = ({ getData, dataLabel }: Props) => {
   const [records, setRecords] = useState<TimeRecord[] | null>(null)
   const [selectedTimeLabel, setSelectedTimeLabel] = useState<string>(DEFAULT_SELECTED_TIME)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     ;(async () => {
       setIsLoading(true)
-      const selectedTime = timeButtons.find(button => button.label === selectedTimeLabel)?.time
-      if (!selectedTime) {
+      const selectedTimeRange = timeButtons.find(button => button.label === selectedTimeLabel)?.time
+      if (!selectedTimeRange) {
         return
       }
       const currentTime = Date.now()
-      const data = await getData(currentTime - selectedTime)
-      if (!data) {
-        return
+      const data = await getData(currentTime - selectedTimeRange)
+      if (data) {
+        setRecords(data)
+      } else {
+        setRecords(null)
       }
-      setRecords(data)
       setIsLoading(false)
     })()
   }, [selectedTimeLabel, getData])
 
   return (
     <div>
-      <div className="chart__container my-2">
+      <div className="chart__container my-4">
         {records && !isLoading && (
           <LineChart
             labels={records.map(record => record.date)}
@@ -75,6 +72,9 @@ const TimeChart = ({ getData, dataLabel }: Props) => {
             <Loader />
           </div>
         )}
+        {!isLoading && !records && (
+          <ErrorMessage message="An error occurred while getting chart data" />
+        )}
       </div>
       <div className="text-center mb-2">
         {timeButtons.map(timeButton => (
@@ -82,6 +82,7 @@ const TimeChart = ({ getData, dataLabel }: Props) => {
             onClick={() => setSelectedTimeLabel(timeButton.label)}
             text={timeButton.label}
             invert={timeButton.label !== selectedTimeLabel}
+            key={timeButton.label}
           />
         ))}
       </div>

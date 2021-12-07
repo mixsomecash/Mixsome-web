@@ -31,7 +31,7 @@ const LineChart = ({ labels, data, dataLabel }: Props) => {
       options: {
         scales: {
           x: { ticks: { display: false }, grid: { display: false } },
-          y: { ticks: { maxTicksLimit: 2 }, grid: { display: false } },
+          y: { ticks: { maxTicksLimit: 3 }, grid: { display: false } },
         },
         elements: {
           point: {
