@@ -1,23 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { ErrorMessage, Loader, TimeChart } from 'components'
+import { ErrorMessage, Loader, TimeChart, TokenTransaction } from 'components'
 import { useMoralis } from 'react-moralis'
-import { MoralisPairAddress, ChainAddress, Exchange } from 'types/moralis'
+import { MoralisPair, ChainId, Exchange } from 'types/moralis'
 import { TimeRecord } from 'components/Charts/TimeChart/types'
+import TokenList from './TokenList'
+import { getInvestToken } from './InvestHelper'
+import { InvestToken } from './types'
 
 const CHART_DATES_COUNT = 16
+const CHART_LAST_VALUE_AGE_SECONDS = 60
 
 type Props = {
   token0Address: string
   token1Address: string
   exchange: Exchange
-  chainId: ChainAddress
+  chainId: ChainId
+  description: string
 }
 
 const Invest = (props: Props) => {
-  const { token0Address, token1Address, exchange, chainId } = props
+  const { token0Address, token1Address, exchange, chainId, description } = props
   const { Moralis, isAuthenticated } = useMoralis()
-  const [pair, setPair] = useState<MoralisPairAddress | null>(null)
-  const [lastReserve, setLastReserve] = useState<number | null>(null)
+  const [pair, setPair] = useState<MoralisPair | null>(null)
+  const [tokens, setTokens] = useState<InvestToken[] | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
@@ -41,13 +46,13 @@ const Invest = (props: Props) => {
           pair_address: pairData.pairAddress,
           chain: chainId,
         })
-        if (lastReserves) {
-          setLastReserve(Number(lastReserves.reserve0) / 10 ** Number(pairData.token0.decimals))
-        }
+        const token0 = await getInvestToken(pairData.token0, lastReserves.reserve0, chainId)
+        const token1 = await getInvestToken(pairData.token1, lastReserves.reserve1, chainId)
+        setTokens([token0, token1])
       }
       setIsLoading(false)
     })()
-  }, [Moralis.Web3API.defi, token0Address, token1Address, exchange, chainId, isAuthenticated])
+  }, [Moralis, token0Address, token1Address, exchange, chainId, isAuthenticated])
 
   if (!isAuthenticated) {
     return <ErrorMessage message="Please connect to your wallet" />
@@ -57,7 +62,7 @@ const Invest = (props: Props) => {
     if (!pair) {
       return null
     }
-    const currentTime = Date.now()
+    const currentTime = Date.now() - CHART_LAST_VALUE_AGE_SECONDS * 1000
     const dates = Array.from(
       new Array(CHART_DATES_COUNT),
       (_, i) => currentTime - (currentTime - fromTime) * (i / CHART_DATES_COUNT),
@@ -76,35 +81,52 @@ const Invest = (props: Props) => {
     return (
       reserves?.map((res, i) => ({
         date: dates[i],
-        value: Number(res.reserve0) / 10 ** Number(pair.token0.decimals),
+        value: Moralis.Units.FromWei(res.reserve0, parseFloat(pair.token0.decimals)),
       })) ?? null
     )
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3">
-      <div className="col-span-2 bg-white px-5 py-3">
-        {!isLoading && pair && (
-          <div>
-            <div className="text-32 pt-2">
-              {pair.token0.symbol} / {pair.token1.symbol}
+    <div>
+      {!isLoading && tokens && pair && (
+        <div className="grid grid-cols-1 md:grid-cols-3">
+          <div className="col-span-2 mx-1 my-1">
+            <div className="bg-white px-5 py-3">
+              <div className="text-32 pt-2">
+                {tokens[0].symbol} / {tokens[1].symbol}
+              </div>
+              <div className="pb-2">
+                {tokens[0].name} / {tokens[1].name}
+              </div>
+              <div className="text-32 text-green font-bold">{tokens[0].reserve.toFixed(4)}</div>
+              <TimeChart getData={getReserves} dataLabel={`${pair?.token0.symbol} Reserve`} />
             </div>
-            <div className="pb-2">
-              {pair.token0.name} / {pair.token1.name}
+          </div>
+          <div className="col-span-1 mx-1 my-1">
+            <div className="bg-white px-5 py-1">
+              <TokenTransaction pair={pair} />
             </div>
-            {lastReserve ? (
-              <div className="text-32 text-green font-bold">{lastReserve.toFixed(4)}</div>
-            ) : null}
-            <TimeChart getData={getReserves} dataLabel={`${pair?.token0.symbol} Reserve`} />
           </div>
-        )}
-        {isLoading && !pair && (
-          <div className="text-center">
-            <Loader />
+          <div className="col-span-2 mx-1 my-1">
+            <div className="bg-white px-5 py-3">
+              <div className="text-24 pt-2">Tokens</div>
+              <TokenList tokens={tokens} />
+            </div>
           </div>
-        )}
-        {!isLoading && !pair && <ErrorMessage message="An error occured while getting pair data" />}
-      </div>
+          <div className="col-span-1 mx-1 my-1">
+            <div className="bg-white px-5 py-3">
+              <div className="text-24 py-2">Description</div>
+              <p>{description}</p>
+            </div>
+          </div>
+        </div>
+      )}
+      {isLoading && !pair && (
+        <div className="text-center">
+          <Loader />
+        </div>
+      )}
+      {!isLoading && !pair && <ErrorMessage message="An error occured while getting pair data" />}
     </div>
   )
 }

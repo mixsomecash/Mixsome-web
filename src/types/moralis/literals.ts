@@ -1,4 +1,4 @@
-export type ChainAddress = '0x1' | '0x38'
+export type ChainId = '0x1' | '0x38'
 export type Exchange =
   | 'uniswapv2'
   | 'uniswapv3'

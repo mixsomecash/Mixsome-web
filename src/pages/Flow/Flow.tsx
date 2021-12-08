@@ -15,6 +15,7 @@ const Flow = () => {
         token1Address="0xe9e7cea3dedca5984780bafc599bd69add087d56"
         exchange="pancakeswapv2"
         chainId="0x38"
+        description="Wrapped BNB and BUSD Pair"
       />
     )
   }
