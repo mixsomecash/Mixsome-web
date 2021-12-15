@@ -3,7 +3,6 @@ import { useGetApproval, useGetPoolData, useGetApprovalStatus } from 'hooks'
 import { Button, Modal, InvestInput } from 'components'
 import { useMoralis } from 'react-moralis'
 import { AppContext } from 'AppContext'
-import { PoolModel } from 'types/models'
 
 type Props = {
   isVisible: boolean
