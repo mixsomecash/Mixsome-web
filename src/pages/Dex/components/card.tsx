@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useMoralis } from 'react-moralis'
-import { Button, Card, InputNumber, Image, Modal } from 'antd'
+import { Button, Card, InputNumber, Image, Modal, Row, Col, Typography, Divider } from 'antd'
 import { ArrowDownOutlined } from '@ant-design/icons'
 
-import type { DexToken, CurrentTrade } from '../../../types/models/dex'
+import type { DexToken, CurrentTrade, Quote } from '../../../types/models/dex'
 import { nativeAddress } from '../services/constants'
 
 import { ModalContent } from './modal-content'
+import { ToAmountUsdPrice } from './to-amount-usd-price'
 
 interface CardComponentProps {
   chain: string
@@ -54,6 +55,8 @@ export const CardComponent: React.FC<CardComponentProps> = (props: CardComponent
 
   const [currentTrade, setCurrentTrade] = useState<CurrentTrade | null>(null)
 
+  const [quote, setQuote] = useState<Quote | null>(null)
+
   const handleFromAmount = (value: string): void => setFromAmount(value)
 
   const handleToAmount = (value: string): void => setToAmount(value)
@@ -93,36 +96,28 @@ export const CardComponent: React.FC<CardComponentProps> = (props: CardComponent
 
   useEffect(() => {
     if (fromToken && toToken && fromAmount) {
-      // const fromTokenRaw = {
-      //   address: fromToken.address,
-      //   decimals: fromToken.decimals,
-      //   logoURI: fromToken.logoURI,
-      //   name: fromToken.name,
-      //   symbol: fromToken.symbol,
-      // }
-
-      // const toTokenRaw = {
-      //   address: toToken.address,
-      //   decimals: toToken.decimals,
-      //   logoURI: toToken.logoURI,
-      //   name: toToken.name,
-      //   symbol: toToken.symbol,
-      // }
-
       setCurrentTrade({
         chain,
         fromTokenAddress: fromToken.address,
         toTokenAddress: toToken.address,
-        amount: parseFloat(fromAmount),
+        amount: Moralis.Units.Token(fromAmount, 18).toString(),
       })
     }
-  }, [chain, fromToken, toToken, fromAmount])
+  }, [Moralis, chain, fromToken, toToken, fromAmount])
 
   useEffect(() => {
     const getQuote = () => {
-      if (!Moralis?.Plugins?.oneInch) return undefined
-      Moralis.Plugins.oneInch.quote(currentTrade).then(quote => {
-        console.log(quote.data)
+      if (!Moralis?.Plugins?.oneInch || !currentTrade) return undefined
+
+      Moralis.Plugins.oneInch.quote(currentTrade).then(response => {
+        setQuote({
+          estimatedGas: response.estimatedGas,
+          fromTokenAmount: response.fromTokenAmount,
+          toTokenAmount: response.toTokenAmount,
+          fromToken: response.fromToken,
+          toToken: response.toToken,
+        })
+        console.log(response)
       })
       return undefined
     }
@@ -212,7 +207,13 @@ export const CardComponent: React.FC<CardComponentProps> = (props: CardComponent
             <div>
               <InputNumber
                 readOnly
-                value={toAmount}
+                value={
+                  quote?.toTokenAmount
+                    ? Moralis.Units.FromWei(quote.toTokenAmount, quote?.toToken?.decimals).toFixed(
+                        6,
+                      )
+                    : toAmount
+                }
                 onChange={handleToAmount}
                 bordered={false}
                 placeholder="0.00"
@@ -225,6 +226,9 @@ export const CardComponent: React.FC<CardComponentProps> = (props: CardComponent
                   width: '100%',
                 }}
               />
+              {fromToken && toToken && (
+                <ToAmountUsdPrice chain={chain} fromToken={fromToken} toToken={toToken} />
+              )}
             </div>
             <Button
               onClick={() => handleModal({ open: true, direction: 'to' })}
@@ -259,6 +263,22 @@ export const CardComponent: React.FC<CardComponentProps> = (props: CardComponent
           </div>
         </Card>
 
+        {quote && (
+          <>
+            <Divider />
+            <Row align="middle" wrap={false}>
+              <Col span={12}>
+                <Typography.Paragraph>Estimated Gas:</Typography.Paragraph>
+              </Col>
+              <Col span={12}>
+                <Typography.Paragraph style={{ textAlign: 'right' }}>
+                  {quote?.estimatedGas}
+                </Typography.Paragraph>
+              </Col>
+            </Row>
+          </>
+        )}
+
         <Button
           type="primary"
           size="large"
@@ -268,8 +288,8 @@ export const CardComponent: React.FC<CardComponentProps> = (props: CardComponent
             borderRadius: '0.6rem',
             height: '50px',
           }}
-          onClick={() => console.log('Save changess!!')}
-          disabled={!ButtonState.isActive}
+          onClick={() => console.log(quote)}
+          // disabled={!ButtonState.isActive}
         >
           {ButtonState.text}
         </Button>

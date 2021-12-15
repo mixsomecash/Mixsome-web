@@ -12,5 +12,13 @@ export type CurrentTrade = {
   chain: string
   fromTokenAddress: string
   toTokenAddress: string
-  amount: number
+  amount: string
+}
+
+export type Quote = {
+  estimatedGas: number
+  fromTokenAmount: string
+  toTokenAmount: string
+  fromToken: DexToken
+  toToken: DexToken
 }
