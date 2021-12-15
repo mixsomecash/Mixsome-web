@@ -1,6 +1,6 @@
 import { CoinGeckoCoin, getCoinsList, getCoinsMarkets } from 'clients/coingecko'
 import { Moralis } from 'moralis'
-import { ChainAddress } from 'types/literals/chainAddress'
+import { ChainId } from 'types/moralis'
 import { networkConfigs } from 'utils/networks'
 
 export type GenericTokenBalance = {
@@ -38,7 +38,7 @@ const getCoinId = (symbol: string, name: string, coins: CoinGeckoCoin[]): string
 
 export const getTokenBalances = async (
   address: string,
-  chainId: ChainAddress,
+  chainId: ChainId,
 ): Promise<GenericTokenBalance[] | null> => {
   const allCoins = await getCoinsList()
   if (!allCoins) {
@@ -96,7 +96,7 @@ export const getTokenBalances = async (
             'https://etherscan.io/images/main/empty-token.png',
           name: token.name,
           symbol: token.symbol,
-          decimals: Number(token.decimals),
+          decimals: parseFloat(token.decimals),
           amount: token.balance,
           price: tokenPrice?.usdPrice || 0,
         }
