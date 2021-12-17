@@ -185,6 +185,7 @@ export const Chain: React.FC<ChainInterface> = (props: ChainInterface) => {
             marginTop: '20px',
             borderRadius: '6px',
             backgroundColor: '#61F38E',
+            color: '#000',
           }}
           size="large"
           onClick={() => trySwap()}
