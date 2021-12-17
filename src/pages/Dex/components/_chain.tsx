@@ -4,7 +4,7 @@ import { Button, Card } from 'antd'
 import { ArrowDownOutlined } from '@ant-design/icons'
 
 import { CurrentTrade, DexToken, Quote } from '../../../types/models/dex'
-import { INITIAL_TOKEN } from '../services/constants'
+import { INITIAL_TOKEN, nativeAddress } from '../services/constants'
 import { processTokenList } from '../services/utils'
 import { Token } from './_token'
 import { Indicator } from './_indicator'
@@ -17,7 +17,7 @@ interface ChainInterface {
 export const Chain: React.FC<ChainInterface> = (props: ChainInterface) => {
   const { path } = props
 
-  const { Moralis } = useMoralis()
+  const { account, Moralis } = useMoralis()
 
   const [tokenList, setTokenList] = useState<DexToken[]>([])
 
@@ -92,6 +92,48 @@ export const Chain: React.FC<ChainInterface> = (props: ChainInterface) => {
     getQuote()
   }, [Moralis.Plugins, currentTrade])
 
+  const doSwap = async () =>
+    Moralis.Plugins.oneInch.swap({
+      chain: path,
+      fromTokenAddress: fromToken.address,
+      toTokenAddress: toToken.address,
+      amount: Moralis.Units.Token(fromTokenAmount, fromToken.decimals).toString(),
+      fromAddress: account,
+      slippage: 1,
+    })
+
+  const trySwap = async () => {
+    const amount = Moralis.Units.Token(fromTokenAmount, fromToken.decimals).toString()
+    if (fromToken.address !== nativeAddress) {
+      await Moralis.Plugins.oneInch
+        .hasAllowance({
+          chain: path,
+          fromTokenAddress: fromToken.address,
+          fromAddress: account,
+          amount,
+        })
+        .then(async allowance => {
+          console.log(allowance)
+
+          await Moralis.Plugins.oneInch.approve({
+            chain: path,
+            tokenAddress: fromToken.address,
+            fromAddress: account,
+          })
+        })
+        .catch(error => alert(error.message))
+    }
+
+    await doSwap()
+      .then(receipt => {
+        if (receipt.statusCode !== 400) {
+          alert('Swap Complete!')
+        }
+        console.log(receipt)
+      })
+      .catch(error => alert(error.message))
+  }
+
   return (
     <Card>
       <Token
@@ -140,7 +182,7 @@ export const Chain: React.FC<ChainInterface> = (props: ChainInterface) => {
           style={{ width: '100%', margin: '8px', marginTop: '20px', borderRadius: '6px' }}
           size="large"
           type="primary"
-          onClick={() => alert('I am ready to swap!!')}
+          onClick={() => trySwap()}
         >
           Swap me!!
         </Button>
