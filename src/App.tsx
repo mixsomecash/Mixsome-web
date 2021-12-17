@@ -2,7 +2,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { MoralisProvider } from 'react-moralis'
 import { Navigation, Sidebar } from 'components'
-import { Main, Flow, Dashboard, Page404, Pools } from 'pages'
+import { Dex, Main, Flow, Dashboard, Page404, Pools } from 'pages'
 import { config } from 'config'
 import AppProvider from './AppContext'
 
@@ -28,6 +28,7 @@ const App = () => {
               <Route path="/pools" component={Pools} exact />
               <Route path="/dashboard" component={Dashboard} exact />
               <Route path="/flows/:id" component={Flow} exact />
+              <Route path="/1inch" component={Dex} exact />
               <Route component={Page404} />
             </Switch>
           </div>

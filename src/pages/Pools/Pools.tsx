@@ -82,7 +82,11 @@ const Pools = () => {
   const renderInvestControl = () => {
     return (
       <div className="xl:w-1/3">
-        <InvestInput onValueChange={handleValueChange} />
+        <InvestInput
+          onValueChange={handleValueChange}
+          symbol="SOME"
+          iconUrl="/images/currencies/mixsome.png"
+        />
       </div>
     )
   }

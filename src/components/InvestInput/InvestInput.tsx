@@ -5,28 +5,18 @@ import CurrencyIcon from 'components/CurrencyIcon'
 import { AppContext } from 'AppContext'
 
 type Props = {
+  symbol: string
+  iconUrl?: string
+  disabled?: boolean
   onValueChange: (value: number) => void
 }
 
-const InvestInput = ({ onValueChange }: Props) => {
-  const { account } = useContext(AppContext)
-
+const InvestInput = ({ symbol, iconUrl, disabled, onValueChange }: Props) => {
   const handleInvestValueChange = (event: FormEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget
-
     const amount = parseFloat(value)
-
     if (onValueChange) onValueChange(amount)
   }
-
-  const renderBalance = async () => {
-    if (!account) return null
-    // const bal = getSmth()
-    // console.log(bal)
-    return <p className="font-regular">My balance: {} SOME</p>
-  }
-
-  if (!account) return null
 
   return (
     <div className="pt-5 xl:pt-0">
@@ -37,13 +27,15 @@ const InvestInput = ({ onValueChange }: Props) => {
         <input
           className="bg-silver flex-1 font-mono text-16 leading-21 xl:text-20 xl:leading-26 r-1 min-w-0 py-3 px-4"
           placeholder="0.00"
+          min={0}
           maxLength={10}
           onChange={handleInvestValueChange}
-          type="text"
+          disabled={disabled ?? false}
+          type="number"
         />
         <div className="flex items-center font-sans pr-4">
-          <CurrencyIcon src="/images/currencies/mixsome.png" />
-          <span className="pl-2 text-xl text-14 leading-18 xl:text-18 xl:leading-24">SOME</span>
+          {iconUrl && <CurrencyIcon src={iconUrl} />}
+          <span className="pl-2 text-xl text-14 leading-18 xl:text-18 xl:leading-24">{symbol}</span>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { FormEvent, useState, useEffect } from 'react'
 import { useMoralis } from 'react-moralis'
 import { ErrorMessage, Loader } from 'components'
-import { ChainAddress } from 'types/literals/chainAddress'
+import { ChainId } from 'types/moralis'
 import { GenericTokenBalance, getTokenBalances, getUsdBalance } from './PortfolioHelper'
 
 type Props = {
@@ -20,11 +20,10 @@ const Portfolio = ({ onNetWorthChange }: Props) => {
     if (!account || !chainId) {
       return
     }
-    // anon func
     ;(async () => {
       setErrorMessage(null)
       setIsLoading(true)
-      const balances = await getTokenBalances(account, chainId as ChainAddress)
+      const balances = await getTokenBalances(account, chainId as ChainId)
       if (balances) {
         setTokenBalances(balances)
         if (onNetWorthChange) {
