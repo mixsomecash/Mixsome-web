@@ -1,11 +1,11 @@
 export type DexToken = {
   address: string
   decimals: number
+  label: string
   logoURI: string
   name: string
   symbol: string
-  value?: string
-  label?: string
+  value: string
 }
 
 export type CurrentTrade = {
