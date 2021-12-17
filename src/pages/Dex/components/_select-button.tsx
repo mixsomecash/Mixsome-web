@@ -48,6 +48,7 @@ export const SelectButton: React.FC<ButtonProps> = (props: ButtonProps) => {
         gap: '7px',
         border: 'none',
         marginLeft: '10px',
+        backgroundColor: '#61F38E',
       }}
     >
       {token.name ? (

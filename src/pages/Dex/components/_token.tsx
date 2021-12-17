@@ -4,7 +4,7 @@ import Select from 'react-select'
 import { Card, Modal } from 'antd'
 
 import { DexToken } from '../../../types/models/dex'
-import { nativeAddress, NETWORK_CONFIGS } from '../services/constants'
+import { nativeAddress } from '../services/constants'
 import { isNative, getWrappedNative } from '../services/utils'
 import { Input } from './_input'
 import { SelectButton } from './_select-button'
@@ -87,6 +87,39 @@ export const Token: React.FC<TokenInterface> = (props: TokenInterface) => {
     return undefined
   }, [amount, fetchTokenPrice, isInitialized, path, setUSDPrice, token])
 
+  interface OptionProps {
+    data: any
+  }
+
+  const Option: React.FC<OptionProps> = (optionProps: OptionProps) => {
+    const { data } = optionProps
+
+    const handleClick = event => {
+      event.preventDefault()
+      handleChange(data)
+    }
+
+    return (
+      <a
+        href="#"
+        style={{
+          display: 'flex',
+          margin: '6px',
+          cursor: 'pointer',
+          alignItems: 'center',
+        }}
+        onClick={handleClick}
+      >
+        <img
+          style={{ width: '30px', height: '30px', marginRight: '16px' }}
+          src={data.logoURI}
+          alt={data.label}
+        />
+        {data.label}
+      </a>
+    )
+  }
+
   return (
     <Card>
       <div>
@@ -114,6 +147,7 @@ export const Token: React.FC<TokenInterface> = (props: TokenInterface) => {
           <Select
             value={token}
             options={tokenList}
+            components={{ Option }}
             onChange={handleChange}
             placeholder="Start typing for a search.."
             menuIsOpen

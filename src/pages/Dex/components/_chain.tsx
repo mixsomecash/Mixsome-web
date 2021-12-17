@@ -179,9 +179,14 @@ export const Chain: React.FC<ChainInterface> = (props: ChainInterface) => {
       <div style={{ display: 'flex', justifyContent: 'space-around' }}>
         <Button
           disabled={!quote}
-          style={{ width: '100%', margin: '8px', marginTop: '20px', borderRadius: '6px' }}
+          style={{
+            width: '100%',
+            margin: '8px',
+            marginTop: '20px',
+            borderRadius: '6px',
+            backgroundColor: '#61F38E',
+          }}
           size="large"
-          type="primary"
           onClick={() => trySwap()}
         >
           Swap me!!
