@@ -41,7 +41,6 @@ export const SelectButton: React.FC<ButtonProps> = (props: ButtonProps) => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderRadius: '0.6rem',
         padding: '5px 10px',
         fontWeight: 'bold',
         fontSize: '17px',

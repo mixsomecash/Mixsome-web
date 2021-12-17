@@ -183,7 +183,6 @@ export const Chain: React.FC<ChainInterface> = (props: ChainInterface) => {
             width: '100%',
             margin: '8px',
             marginTop: '20px',
-            borderRadius: '6px',
             backgroundColor: '#61F38E',
             color: '#000',
           }}
