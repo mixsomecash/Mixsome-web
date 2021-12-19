@@ -1,17 +1,15 @@
 import { Currency } from 'constants/currency'
-import { ChainId } from 'types/moralis'
+import { ChainId, MoralisToken } from 'types/moralis'
 
 export type PoolInfo = {
   address: string
   chainId: ChainId
-  decimals: number
-  deposit: string
-  crypto: string
   curencies: Array<Currency>
-  apy: string
 }
 
 export type PoolContractData = {
+  token: MoralisToken
+  apy: number
   stakedTotal: number
   poolSize: number
   maturityDays: number

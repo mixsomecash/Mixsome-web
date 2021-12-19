@@ -21,14 +21,36 @@ export const getPoolContractData = async (
   account: string,
 ): Promise<PoolContractData | null> => {
   await Moralis.Web3.enableWeb3()
+  const tokenAddress = await runPoolContractFunction(poolInfo, 'tokenERC20')
+  if (!tokenAddress) {
+    return null
+  }
+  const tokenMetadata = await Moralis.Web3API.token
+    .getTokenMetadata({ addresses: [tokenAddress], chain: poolInfo.chainId })
+    .catch(() => null)
+  if (!tokenMetadata) {
+    return null
+  }
+  const token = tokenMetadata[0]
+  const apy = await runPoolContractFunction(poolInfo, 'poolApy')
   const stakedTotal = await runPoolContractFunction(poolInfo, 'stakedTotal')
   const poolSize = await runPoolContractFunction(poolInfo, 'poolSize')
   const maturityDays = await runPoolContractFunction(poolInfo, 'maturityDays')
   const launchTime = await runPoolContractFunction(poolInfo, 'launchTime')
   const closingTime = await runPoolContractFunction(poolInfo, 'closingTime')
   const accountStaked = await runPoolContractFunction(poolInfo, 'stakeOf', { account })
-  if (stakedTotal && poolSize && closingTime && accountStaked && maturityDays && launchTime) {
+  if (
+    apy &&
+    stakedTotal &&
+    poolSize &&
+    closingTime &&
+    accountStaked &&
+    maturityDays &&
+    launchTime
+  ) {
     return {
+      token,
+      apy: parseFloat(apy),
       stakedTotal: parseFloat(stakedTotal),
       poolSize: parseFloat(poolSize),
       maturityDays: parseFloat(maturityDays),
@@ -43,7 +65,7 @@ export const getPoolContractData = async (
 export const withdrawTokens = async (poolInfo: PoolInfo) => {
   const connector = await Moralis.Web3.enableWeb3()
   const pool = new connector.eth.Contract(tokenContractAbi as AbiItem[], poolInfo.address)
-  await pool.methods.withdraw.call()
+  await pool.methods.withdraw.send()
 }
 
 export const getPoolMaturity = (poolContractData: PoolContractData) => {

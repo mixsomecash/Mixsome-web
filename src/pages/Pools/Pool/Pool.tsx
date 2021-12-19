@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import classNames from 'classnames'
+import { useMoralis } from 'react-moralis'
 import { getCurrencyIconFileName } from 'utils/currencyIcon'
 import { Currency } from 'constants/currency'
 import { Button, ErrorMessage, Loader, Progress } from 'components'
-import { useMoralis } from 'react-moralis'
 import { networkConfigs } from 'utils/networks'
 import { PoolInfo, PoolContractData } from './types'
 import { getPoolContractData, getPoolMaturity, withdrawTokens } from './PoolHelper'
 
 type Props = {
   pool: PoolInfo
-  onLockClick: () => void
 }
 
-const Pool = ({ pool, onLockClick }: Props) => {
+const Pool = ({ pool }: Props) => {
   const { Moralis, chainId, account } = useMoralis()
   const [poolContractData, setPoolContractData] = useState<PoolContractData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -32,6 +31,10 @@ const Pool = ({ pool, onLockClick }: Props) => {
       setIsLoading(false)
     })()
   }, [Moralis.Web3, account, pool])
+
+  const handleLockClick = () => {
+    alert('Pool is full')
+  }
 
   const handleWithdrawClick = async () => {
     if (!poolContractData) {
@@ -53,17 +56,18 @@ const Pool = ({ pool, onLockClick }: Props) => {
       ? [
           {
             label: 'Deposit',
-            value: pool.deposit,
+            value: poolContractData.token.symbol,
           },
           {
             label: 'APY',
-            value: pool.apy,
+            value: `${poolContractData.apy}%`,
           },
           {
             label: 'Total Liquidity',
-            value: `${Moralis.Units.FromWei(poolContractData.stakedTotal, pool.decimals)} ${
-              pool.deposit
-            }`,
+            value: `${Moralis.Units.FromWei(
+              poolContractData.stakedTotal,
+              parseFloat(poolContractData.token.decimals),
+            )} ${poolContractData.token.symbol}`,
           },
           {
             label: 'Network',
@@ -79,9 +83,10 @@ const Pool = ({ pool, onLockClick }: Props) => {
           },
           {
             label: 'You have staked',
-            value: `${Moralis.Units.FromWei(poolContractData.accountStaked, pool.decimals)} ${
-              pool.deposit
-            }`,
+            value: `${Moralis.Units.FromWei(
+              poolContractData.accountStaked,
+              parseFloat(poolContractData.token.decimals),
+            )} ${[poolContractData.token.symbol]}`,
           },
         ]
       : null
@@ -101,7 +106,7 @@ const Pool = ({ pool, onLockClick }: Props) => {
   }
 
   return (
-    <div className="pool__container bg-white w-full xl:max-w-max select-none xl:mr-20 xl:mb-16 mb-5 p-2">
+    <div className="bg-white w-full xl:max-w-max select-none xl:mr-20 xl:mb-16 mb-5 py-2 px-4">
       {poolContractData && chainId && !isLoading && (
         <div className="m-10">
           <div className="flex mb-10">{pool.curencies.map(renderCurrencyIcon)}</div>
@@ -123,7 +128,7 @@ const Pool = ({ pool, onLockClick }: Props) => {
             />
           </div>
           <div className="flex justify-center">
-            <Button text="Lock" invert onClick={onLockClick} />
+            <Button text="Lock" invert onClick={handleLockClick} />
             <div className="ml-3" />
             <Button text="Withdraw" onClick={handleWithdrawClick} />
           </div>
