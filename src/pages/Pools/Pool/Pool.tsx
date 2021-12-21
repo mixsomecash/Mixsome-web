@@ -45,7 +45,7 @@ const Pool = ({ pool }: Props) => {
       return
     }
     if (getPoolMaturity(poolContractData) < Date.now()) {
-      await withdrawTokens(pool)
+      await withdrawTokens(pool, account || '')
     } else {
       alert('Maturity period is not over yet')
     }

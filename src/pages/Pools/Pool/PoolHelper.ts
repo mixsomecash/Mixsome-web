@@ -62,10 +62,10 @@ export const getPoolContractData = async (
   return null
 }
 
-export const withdrawTokens = async (poolInfo: PoolInfo) => {
+export const withdrawTokens = async (poolInfo: PoolInfo, account: string) => {
   const connector = await Moralis.Web3.enableWeb3()
   const pool = new connector.eth.Contract(tokenContractAbi as AbiItem[], poolInfo.address)
-  await pool.methods.withdraw.send()
+  await pool.methods.withdraw.send({ from: account })
 }
 
 export const getPoolMaturity = (poolContractData: PoolContractData) => {
