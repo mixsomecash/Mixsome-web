@@ -37,7 +37,7 @@ const Pool = ({ pool }: Props) => {
   }
 
   const handleWithdrawClick = async () => {
-    if (!poolContractData) {
+    if (!poolContractData || !account) {
       return
     }
     if (chainId && chainId !== pool.chainId) {
@@ -45,7 +45,7 @@ const Pool = ({ pool }: Props) => {
       return
     }
     if (getPoolMaturity(poolContractData) < Date.now()) {
-      await withdrawTokens(pool, account || '')
+      await withdrawTokens(pool, account)
     } else {
       alert('Maturity period is not over yet')
     }

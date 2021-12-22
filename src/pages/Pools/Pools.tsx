@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Currency } from 'constants/currency'
 import { LinkWithArrow } from 'components'
 import Pool from './Pool'
