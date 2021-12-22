@@ -65,10 +65,6 @@ body {
   @apply pl-8;
 }
 
-.pool__container {
-  min-width: 300px;
-}
-
 .burger-button div {
   width: 25px;
   height: 2px;
