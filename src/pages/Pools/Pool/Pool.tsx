@@ -1,71 +1,95 @@
-import React, { useEffect, useState, useContext, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import classNames from 'classnames'
+import { useMoralis } from 'react-moralis'
 import { getCurrencyIconFileName } from 'utils/currencyIcon'
 import { Currency } from 'constants/currency'
-import { Button, Progress } from 'components'
-import { PoolModel } from 'types/models'
-import { getAccountAddress, getSigner, toEth } from 'clients/ethereum'
-import { useGetPoolData, useGetApprovalStatus, useGetTotalStaked, useGetApproval } from 'hooks'
-import { useMoralis } from 'react-moralis'
-import tokenContractAbi from 'utils/StakingPool.json'
-import { AbiItem } from 'web3-utils'
+import { Button, ErrorMessage, Loader, Progress } from 'components'
+import { networkConfigs } from 'utils/networks'
+import { PoolInfo, PoolContractData } from './types'
+import { getPoolContractData, getPoolMaturity, withdrawTokens } from './PoolHelper'
 
 type Props = {
-  pool: PoolModel
-  onLockClick: () => void
-  onUnlockClick: () => void
-  totalLiquidity: string
+  pool: PoolInfo
 }
-const Pool = ({ pool, onLockClick, onUnlockClick, totalLiquidity }: Props) => {
-  const { user, isAuthenticated, web3, Moralis } = useMoralis()
-  const { getStaked } = useGetTotalStaked('0xc56fFEFE53CE0fdf80eE7071d250E86d4819f3Dc')
-  const [isNetwork, setNetwork] = useState(0)
-  const [progressValue, setProgressValue] = useState(0)
-  const [TotalValue, setTotalValue] = useState(0)
-  const [progressBarValue, setProgressBarValue] = useState(0)
-  const [userStaked, setUserStaked] = useState(0)
-  const [userAddress, setUserAddress] = useState('0x')
 
-  // const userAddress = useMemo(() => user?.attributes.ethAddress, [user])
-  const useTransactions = () => {
-    const [address, setAddress] = useState()
-    useEffect(() => {
-      if (isAuthenticated) {
-        setAddress(user?.attributes.ethAddress)
-        console.log(address)
-      }
-    }, [address])
-  }
+const Pool = ({ pool }: Props) => {
+  const { Moralis, chainId, account } = useMoralis()
+  const [poolContractData, setPoolContractData] = useState<PoolContractData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Run! Like go get some data from an API.
-    const get = async () => {
-      try {
-        const connector = await Moralis.Web3.enable()
-        const chainIdDec = await connector.eth.getChainId()
-        if (chainIdDec === 1) {
-          setNetwork(1)
-        } else if (chainIdDec === 56) {
-          console.log('a')
-        }
-        console.log(await connector.eth.getChainId())
-        const staked = new connector.eth.Contract(tokenContractAbi as AbiItem[], pool.address)
-        const tx1 = await staked.methods.stakedTotal().call()
-        const tx2 = await staked.methods.poolSize().call()
-        console.log(userAddress)
-        const tx3 = await staked.methods.stakeOf(await getAccountAddress()).call()
-        setProgressValue(tx1)
-        setTotalValue(tx2)
-        setUserStaked(tx3)
-        console.log(tx1, tx2, tx3)
-        setProgressBarValue(Math.round(tx1) / Math.round(tx2))
-      } catch {
-        console.log('Failed to get address')
-      }
+    if (!account) {
+      return
     }
-    get()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+
+    ;(async () => {
+      setIsLoading(true)
+      const poolData = await getPoolContractData(pool, account)
+      if (poolData) {
+        setPoolContractData(poolData)
+      }
+      setIsLoading(false)
+    })()
+  }, [Moralis.Web3, account, pool])
+
+  const handleLockClick = () => {
+    alert('Pool is full')
+  }
+
+  const handleWithdrawClick = async () => {
+    if (!poolContractData || !account) {
+      return
+    }
+    if (chainId && chainId !== pool.chainId) {
+      alert(`Please select ${networkConfigs[pool.chainId].chainName} network and try again`)
+      return
+    }
+    if (getPoolMaturity(poolContractData) < Date.now()) {
+      await withdrawTokens(pool, account)
+    } else {
+      alert('Maturity period is not over yet')
+    }
+  }
+
+  const poolProperties =
+    poolContractData && chainId
+      ? [
+          {
+            label: 'Deposit',
+            value: poolContractData.token.symbol,
+          },
+          {
+            label: 'APY',
+            value: `${poolContractData.apy}%`,
+          },
+          {
+            label: 'Total Liquidity',
+            value: `${Moralis.Units.FromWei(
+              poolContractData.stakedTotal,
+              parseFloat(poolContractData.token.decimals),
+            )} ${poolContractData.token.symbol}`,
+          },
+          {
+            label: 'Network',
+            value: networkConfigs[pool.chainId].chainName,
+          },
+          {
+            label: 'Status',
+            value: Date.now() > poolContractData.closingTime ? 'Closed' : 'Open',
+          },
+          {
+            label: 'Maturity',
+            value: new Date(getPoolMaturity(poolContractData)).toDateString(),
+          },
+          {
+            label: 'You have staked',
+            value: `${Moralis.Units.FromWei(
+              poolContractData.accountStaked,
+              parseFloat(poolContractData.token.decimals),
+            )} ${[poolContractData.token.symbol]}`,
+          },
+        ]
+      : null
 
   const renderCurrencyIcon = (currency: Currency, index: number) => {
     const iconUrl = `/images/currencies/${getCurrencyIconFileName(currency)}`
@@ -82,62 +106,42 @@ const Pool = ({ pool, onLockClick, onUnlockClick, totalLiquidity }: Props) => {
   }
 
   return (
-    <div className="pool__container bg-white w-full xl:max-w-max select-none xl:mr-20 xl:mb-16 mb-5">
-      <div className="m-10">
-        <div className="flex mb-10">{pool.curencies.map(renderCurrencyIcon)}</div>
-        <div className="mb-16">
-          <ul>
-            <li>
-              <div className="flex">
-                <span className="text-14 xl:text-16 leading-42 opacity-60">Deposit</span>
-                <span className="font-mono text-14 xl:text-16 leading-42 ml-auto">
-                  {pool.deposit}
-                </span>
-              </div>
-            </li>
-            <li>
-              <div className="flex">
-                <span className="text-14 xl:text-16 leading-42 opacity-60">APY</span>
-                <span className="font-mono text-14 xl:text-16 leading-42 ml-auto">{pool.apy}</span>
-              </div>
-            </li>
-            <li>
-              <div className="flex">
-                <span className="text-14 xl:text-16 leading-42 opacity-60">Total Liquidity</span>
-                <span className="font-mono text-14 xl:text-16 leading-42 ml-auto">
-                  {pool.totalLiquidity}
-                </span>
-              </div>
-              <div className="flex">
-                <span className="text-14 xl:text-16 leading-42 opacity-60">Must use: </span>
-                <span className="font-mono text-14 xl:text-16 leading-42 ml-auto">
-                  {pool.network}
-                </span>
-              </div>
+    <div className="bg-white w-full xl:max-w-max select-none xl:mr-20 xl:mb-16 mb-5 py-2 px-4">
+      {poolContractData && chainId && !isLoading && (
+        <div className="m-10">
+          <div className="flex mb-10">{pool.curencies.map(renderCurrencyIcon)}</div>
+          <div className="mb-16">
+            {poolProperties?.map(poolProperty => (
               <div className="flex">
                 <span className="text-14 xl:text-16 leading-42 opacity-60">
-                  You Have Already Staked:
+                  {poolProperty.label}
                 </span>
                 <span className="font-mono text-14 xl:text-16 leading-42 ml-auto">
-                  {toEth(userStaked)} SOME
+                  {poolProperty.value}
                 </span>
               </div>
-              <div className="flex">
-                <span className="text-14 xl:text-16 leading-42 opacity-60">Status:</span>
-                <span className="font-mono text-14 xl:text-16 leading-42 ml-auto">
-                  {pool.status}
-                  <Progress completed={Math.round(progressBarValue * 100)} />
-                </span>
-              </div>
-            </li>
-          </ul>
+            ))}
+            <Progress
+              completed={Math.round(
+                (poolContractData.stakedTotal / poolContractData.poolSize) * 100,
+              )}
+            />
+          </div>
+          <div className="flex justify-center">
+            <Button text="Lock" invert onClick={handleLockClick} />
+            <div className="ml-3" />
+            <Button text="Withdraw" onClick={handleWithdrawClick} />
+          </div>
         </div>
-        <div className="flex justify-center">
-          <Button text="Lock" invert onClick={onLockClick} />
-          <div className="ml-3" />
-          <Button text="Withdraw" onClick={onUnlockClick} />
+      )}
+      {isLoading && (
+        <div className="text-center">
+          <Loader />
         </div>
-      </div>
+      )}
+      {!isLoading && (!poolContractData || !chainId) && (
+        <ErrorMessage message="An error occured while getting pool data" />
+      )}
     </div>
   )
 }
