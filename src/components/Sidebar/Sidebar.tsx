@@ -72,6 +72,7 @@ const Sidebar = () => {
           </div>
           {renderLink('Flows', '/')}
           {renderLink('DEX', '/1inch')}
+          {renderLink('NFT', '/nft')}
         </nav>
         <div className="hidden lg:block mt-auto mx-5 mb-32 pb-5">
           {renderSocialLinks()}
