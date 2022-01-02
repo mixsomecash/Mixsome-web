@@ -6,32 +6,10 @@ import { getExplorer } from '../../../utils/networks'
 
 const { Meta } = Card
 
-type NftToken = {
-  amount: string | null
-  block_number: string | null
-  block_number_minted: string | null
-  contract_type: string | null
-  frozen: number | null
-  is_valid: number | null
-  metadata: any
-  name: string | null
-  owner_of: string | null
-  symbol: string | null
-  synced_at: Date | null
-  syncing: number | null
-  token_address: string | null
-  token_id: string | null
-  token_uri: string | null
-  image?: string | null
-}
-
 const NFT: React.FC = () => {
   const { Moralis, chainId } = useMoralis()
 
   const { data: NFTBalances } = useNFTBalances()
-
-  console.log(NFTBalances)
-  console.log(chainId)
 
   const viewOnBlockExplorer = (_chainId, token_address) => {
     if (_chainId) window.open(`${getExplorer(_chainId)}address/${token_address}`, '_blank')
