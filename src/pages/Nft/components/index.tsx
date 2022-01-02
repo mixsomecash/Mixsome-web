@@ -1,47 +1,42 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Image, Tooltip, Modal, Input, Skeleton } from 'antd'
 import { FileSearchOutlined, SendOutlined, ShoppingCartOutlined } from '@ant-design/icons'
+import { useMoralis, useNFTBalances } from 'react-moralis'
+import { getExplorer } from '../../../utils/networks'
 
 const { Meta } = Card
 
 type NftToken = {
-  contract_type: string
-  image: string
-  name: string
-  token_address: string
-  token_id: string
+  amount: string | null
+  block_number: string | null
+  block_number_minted: string | null
+  contract_type: string | null
+  frozen: number | null
+  is_valid: number | null
+  metadata: any
+  name: string | null
+  owner_of: string | null
+  symbol: string | null
+  synced_at: Date | null
+  syncing: number | null
+  token_address: string | null
+  token_id: string | null
+  token_uri: string | null
+  image?: string | null
 }
 
 const NFT: React.FC = () => {
-  const [result, setResult] = useState<NftToken[] | null>(null)
+  const { Moralis, chainId } = useMoralis()
 
-  useEffect(() => {
-    setTimeout(() => {
-      setResult([
-        {
-          contract_type: 'nft',
-          image: 'ropsten_nft.jpg',
-          name: 'Ropsten NFT',
-          token_address: '263e0668-61ef-444d-9c12-bf3bf6a9182c',
-          token_id: 'c53a64b8-bf4f-4d01-9841-836326d5a4d6',
-        },
-        {
-          contract_type: 'nft',
-          image: 'binance_nft.jpg',
-          name: 'Binance NFT',
-          token_address: '4f321054-8eaa-47a3-8fa0-8bbb412c43c8',
-          token_id: 'b98c4544-4ac4-49ec-96c7-ece01db45f4a',
-        },
-        {
-          contract_type: 'nft',
-          image: 'ethereum_nft.jpg',
-          name: 'Ethereum NFT',
-          token_address: '2c939f46-4e42-4f37-9f04-44b163e9cb50',
-          token_id: '37c0354a-0f86-470b-a2d7-ce6eb66b3e8a',
-        },
-      ])
-    }, 1000)
-  }, [])
+  const { data: NFTBalances } = useNFTBalances()
+
+  console.log(NFTBalances)
+  console.log(chainId)
+
+  const viewOnBlockExplorer = (_chainId, token_address) => {
+    if (_chainId) window.open(`${getExplorer(_chainId)}address/${token_address}`, '_blank')
+    return undefined
+  }
 
   return (
     <div style={{ padding: '15px', maxWidth: '1030px', width: '100%' }}>
@@ -58,16 +53,18 @@ const NFT: React.FC = () => {
           gap: '10px',
         }}
       >
-        <Skeleton loading={!result}>
-          {result &&
-            result.map(nft => {
+        <Skeleton loading={!NFTBalances?.result}>
+          {NFTBalances?.result &&
+            NFTBalances.result.map(nft => {
               // nft = verifyMetadata(nft)
               return (
                 <Card
                   hoverable
                   actions={[
                     <Tooltip title="View On Blockexplorer">
-                      <FileSearchOutlined onClick={() => alert('Hello NFT!!')} />
+                      <FileSearchOutlined
+                        onClick={() => viewOnBlockExplorer(chainId, nft.token_address)}
+                      />
                     </Tooltip>,
                     <Tooltip title="Transfer NFT">
                       <SendOutlined onClick={() => alert('Transfer NFTs!!')} />
