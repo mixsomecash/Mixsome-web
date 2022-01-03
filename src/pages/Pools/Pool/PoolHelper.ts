@@ -39,12 +39,14 @@ export const getPoolContractData = async (
   const launchTime = await runPoolContractFunction(poolInfo, 'launchTime')
   const closingTime = await runPoolContractFunction(poolInfo, 'closingTime')
   const accountStaked = await runPoolContractFunction(poolInfo, 'stakeOf', { account })
+  const accountStakedTime = await runPoolContractFunction(poolInfo, 'stakeTimeOf', { account })
   if (
     apy &&
     stakedTotal &&
     poolSize &&
     closingTime &&
     accountStaked &&
+    accountStakedTime &&
     maturityDays &&
     launchTime
   ) {
@@ -57,6 +59,7 @@ export const getPoolContractData = async (
       launchTime: parseFloat(launchTime),
       closingTime: parseFloat(closingTime),
       accountStaked: parseFloat(accountStaked),
+      accountStakedTime: parseFloat(accountStakedTime),
     }
   }
   return null
@@ -68,6 +71,11 @@ export const withdrawTokens = async (poolInfo: PoolInfo, account: string) => {
   await pool.methods.withdraw().send({ from: account })
 }
 
-export const getPoolMaturity = (poolContractData: PoolContractData) => {
-  return poolContractData.launchTime * 1000 + poolContractData.maturityDays * 24 * 60 * 60 * 1000
+export const getAccountMaturityDate = (poolContractData: PoolContractData) => {
+  if (poolContractData.accountStakedTime === 0) {
+    return null
+  }
+  return new Date(
+    poolContractData.accountStakedTime * 1000 + poolContractData.maturityDays * 24 * 60 * 60 * 1000,
+  )
 }
