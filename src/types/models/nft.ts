@@ -16,3 +16,11 @@ export type NftToken = {
   token_uri: string | null
   image?: string | null
 }
+
+export type Options = {
+  amount?: number
+  contractAddress: string
+  receiver: string
+  tokenId: string
+  type: string
+}

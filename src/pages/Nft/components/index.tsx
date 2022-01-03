@@ -1,24 +1,47 @@
-import React, { useState, useEffect } from 'react'
-import { Card, Image, Tooltip, Modal, Input, Skeleton } from 'antd'
+import React, { useState } from 'react'
+import { Alert, Card, Image, Tooltip, Skeleton, notification } from 'antd'
 import { FileSearchOutlined, SendOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { useMoralis, useNFTBalances } from 'react-moralis'
 import { getExplorer } from '../../../utils/networks'
 
+import { Modal } from './modal'
+
 const { Meta } = Card
 
 const NFT: React.FC = () => {
-  const { Moralis, chainId } = useMoralis()
-
   const { data: NFTBalances } = useNFTBalances()
+
+  const { error, isFetching } = useNFTBalances()
+
+  const { chainId } = useMoralis()
 
   const viewOnBlockExplorer = (_chainId, token_address) => {
     if (_chainId) window.open(`${getExplorer(_chainId)}address/${token_address}`, '_blank')
     return undefined
   }
 
+  const [visible, setVisibility] = useState(false)
+  const [warning, setWarning] = useState<string | null>(null)
+  const [address, setAddress] = useState<string>('')
+
+  const onCancel = () => {
+    setWarning(null)
+    setAddress('')
+    setVisibility(false)
+  }
+
+  const openNotification = placement => {
+    notification.info({
+      message: 'OPENSEA MARKET',
+      description: 'OpenSea integration coming soon!',
+      placement,
+    })
+  }
+
   return (
     <div style={{ padding: '15px', maxWidth: '1030px', width: '100%' }}>
       <h1>NFT Balances</h1>
+      {error && <Alert message="Could not fetch NFTs!" type="error" />}
       <div
         style={{
           display: 'flex',
@@ -31,7 +54,7 @@ const NFT: React.FC = () => {
           gap: '10px',
         }}
       >
-        <Skeleton loading={!NFTBalances?.result}>
+        <Skeleton loading={isFetching}>
           {NFTBalances?.result &&
             NFTBalances.result.map(nft => {
               // nft = verifyMetadata(nft)
@@ -41,14 +64,21 @@ const NFT: React.FC = () => {
                   actions={[
                     <Tooltip title="View On Blockexplorer">
                       <FileSearchOutlined
+                        style={{ color: '#61F38E' }}
                         onClick={() => viewOnBlockExplorer(chainId, nft.token_address)}
                       />
                     </Tooltip>,
                     <Tooltip title="Transfer NFT">
-                      <SendOutlined onClick={() => alert('Transfer NFTs!!')} />
+                      <SendOutlined
+                        style={{ color: '#61F38E' }}
+                        onClick={() => setVisibility(true)}
+                      />
                     </Tooltip>,
                     <Tooltip title="Sell On OpenSea">
-                      <ShoppingCartOutlined onClick={() => alert('OPENSEA INTEGRATION COMING!')} />
+                      <ShoppingCartOutlined
+                        style={{ color: '#61F38E' }}
+                        onClick={() => openNotification('topLeft')}
+                      />
                     </Tooltip>,
                   ]}
                   style={{ width: 240, border: '2px solid #e7eaf3' }}
@@ -68,6 +98,14 @@ const NFT: React.FC = () => {
               )
             })}
         </Skeleton>
+        <Modal
+          visible={visible}
+          onCancel={onCancel}
+          warning={warning}
+          setWarning={setWarning}
+          address={address}
+          setAddress={setAddress}
+        />
       </div>
     </div>
   )
