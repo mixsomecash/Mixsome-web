@@ -1,10 +1,9 @@
 import React from 'react'
-
 import classNames from 'classnames'
 
 type Props = {
   title: string
-  body: string
+  body: number
   inline?: boolean
 }
 

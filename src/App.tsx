@@ -1,11 +1,9 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { MoralisProvider } from 'react-moralis'
-
 import { Navigation, Sidebar } from 'components'
 import { Dex, Main, Flow, Dashboard, Page404, Pools } from 'pages'
 import { config } from 'config'
-
 import AppProvider from './AppContext'
 
 const App = () => {
@@ -13,7 +11,9 @@ const App = () => {
     return <div>Error: Check app configuration.</div>
   }
 
-  if (!config.moralis.appId || !config.moralis.serverUrl) return renderWrongConfiguration()
+  if (!config.moralis.appId || !config.moralis.serverUrl) {
+    return renderWrongConfiguration()
+  }
 
   return (
     <AppProvider>

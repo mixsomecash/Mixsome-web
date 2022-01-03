@@ -36,7 +36,7 @@
     "chart.js": "^3.6.1",
     "classnames": "^2.3.1",
     "ethers": "^5.1.0",
-    "moralis": "^0.0.134",
+    "moralis": "^0.0.140",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-jazzicon": "^0.1.3",
