@@ -35,8 +35,17 @@ interface TokenInterface {
 }
 
 export const Token: React.FC<TokenInterface> = (props: TokenInterface) => {
-  const { direction, amount, setAmount, token, setToken, tokenList, usdPrice, setUSDPrice, path } =
-    props
+  const {
+    direction,
+    amount,
+    setAmount,
+    token,
+    setToken,
+    tokenList,
+    usdPrice,
+    setUSDPrice,
+    path,
+  } = props
 
   const { isInitialized } = useMoralis()
 
