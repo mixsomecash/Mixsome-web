@@ -88,7 +88,7 @@ const Dashboard = () => {
       case DashboardTab.History:
         return <History />
       case DashboardTab.Defi:
-        return <Defi networkId={selectedNetworkId} />
+        return <Defi />
       default:
         return null
     }
