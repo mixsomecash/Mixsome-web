@@ -6,7 +6,7 @@ import { Currency } from 'constants/currency'
 import { Button, ErrorMessage, Loader, Progress } from 'components'
 import { networkConfigs } from 'utils/networks'
 import { PoolInfo, PoolContractData } from './types'
-import { getPoolContractData, getPoolMaturity, withdrawTokens } from './PoolHelper'
+import { getAccountMaturityDate, getPoolContractData, withdrawTokens } from './PoolHelper'
 
 type Props = {
   pool: PoolInfo
@@ -44,11 +44,15 @@ const Pool = ({ pool }: Props) => {
       alert(`Please select ${networkConfigs[pool.chainId].chainName} network and try again`)
       return
     }
-    if (getPoolMaturity(poolContractData) < Date.now()) {
-      await withdrawTokens(pool, account)
-    } else {
-      alert('Maturity period is not over yet')
+    const accountMaturityDate = getAccountMaturityDate(poolContractData)
+    if (!accountMaturityDate) {
+      return
     }
+    if (accountMaturityDate.getTime() > Date.now()) {
+      alert('Maturity period is not over yet')
+      return
+    }
+    await withdrawTokens(pool, account)
   }
 
   const poolProperties =
@@ -79,7 +83,7 @@ const Pool = ({ pool }: Props) => {
           },
           {
             label: 'Maturity',
-            value: new Date(getPoolMaturity(poolContractData)).toDateString(),
+            value: getAccountMaturityDate(poolContractData)?.toUTCString() ?? '-',
           },
           {
             label: 'You have staked',
@@ -112,13 +116,13 @@ const Pool = ({ pool }: Props) => {
           <div className="flex mb-10">{pool.curencies.map(renderCurrencyIcon)}</div>
           <div className="mb-16">
             {poolProperties?.map(poolProperty => (
-              <div className="flex">
-                <span className="text-14 xl:text-16 leading-42 opacity-60">
+              <div className="flex" key={poolProperty.label}>
+                <div className="text-14 xl:text-16 leading-42 opacity-60 mr-2">
                   {poolProperty.label}
-                </span>
-                <span className="font-mono text-14 xl:text-16 leading-42 ml-auto">
+                </div>
+                <div className="font-mono text-14 xl:text-16 leading-42 ml-auto">
                   {poolProperty.value}
-                </span>
+                </div>
               </div>
             ))}
             <Progress
