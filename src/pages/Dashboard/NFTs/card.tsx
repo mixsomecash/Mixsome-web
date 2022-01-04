@@ -42,7 +42,7 @@ export const Card: React.FC<CardProps> = (props: CardProps) => {
           />
         </Tooltip>,
       ]}
-      style={{ width: 240, border: '2px solid #e7eaf3' }}
+      style={{ width: 300, border: '2px solid #e7eaf3' }}
       cover={
         <Image
           preview={false}
