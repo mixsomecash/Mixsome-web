@@ -1,17 +1,7 @@
 import React from 'react'
 import { Alert, Button, Modal as AndModal, Input } from 'antd'
 
-interface OnCancel {
-  (): void
-}
-
-interface SetWarning {
-  (value: string | null): void
-}
-
-interface SetAddress {
-  (value: string): void
-}
+import { OnCancel, SetWarning, SetAddress } from '../../../types/models/nft'
 
 interface ModalProps {
   visible: boolean

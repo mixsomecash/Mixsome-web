@@ -24,3 +24,23 @@ export type Options = {
   tokenId: string
   type: string
 }
+
+export type OpenNotification = {
+  (value: string): void
+}
+
+export type SetVisibility = {
+  (value: boolean): void
+}
+
+export type OnCancel = {
+  (): void
+}
+
+export type SetWarning = {
+  (value: string | null): void
+}
+
+export type SetAddress = {
+  (value: string): void
+}
