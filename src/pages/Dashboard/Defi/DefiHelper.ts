@@ -15,40 +15,38 @@ export const getDefiTransactions = async (
     return null
   }
   const defiTransactions = await Promise.all(
-    transfers.result.map(
-      async (transfer): Promise<DefiTransaction | null> => {
-        const transaction = await Moralis.Web3API.native
-          .getTransaction({ transaction_hash: transfer.transaction_hash, chain: chainId })
-          .catch(() => null)
-        if (!transaction) {
-          return null
-        }
-        const transactionDefiData = contracts[transaction.to_address]
-        if (!transactionDefiData) {
-          return null
-        }
-        const { abi } = transactionDefiData
-        const contractInterface = new ethers.utils.Interface(abi)
-        const inputData = contractInterface.parseTransaction({ data: transaction.input })
-        if (
-          !inputData ||
-          inputData.name !== transactionDefiData.function ||
-          !inputData.args[transactionDefiData.argument]
-        ) {
-          return null
-        }
-        return {
-          transactionHash: transaction.hash,
-          contractAddress: transaction.to_address,
-          token: transfer.address,
-          function: transactionDefiData.function,
-          amount: Moralis.Units.FromWei(
-            inputData.args[transactionDefiData.argument],
-            transactionDefiData.decimals,
-          ),
-        }
-      },
-    ),
+    transfers.result.map(async (transfer): Promise<DefiTransaction | null> => {
+      const transaction = await Moralis.Web3API.native
+        .getTransaction({ transaction_hash: transfer.transaction_hash, chain: chainId })
+        .catch(() => null)
+      if (!transaction) {
+        return null
+      }
+      const transactionDefiData = contracts[transaction.to_address]
+      if (!transactionDefiData) {
+        return null
+      }
+      const { abi } = transactionDefiData
+      const contractInterface = new ethers.utils.Interface(abi)
+      const inputData = contractInterface.parseTransaction({ data: transaction.input })
+      if (
+        !inputData ||
+        inputData.name !== transactionDefiData.function ||
+        !inputData.args[transactionDefiData.argument]
+      ) {
+        return null
+      }
+      return {
+        transactionHash: transaction.hash,
+        contractAddress: transaction.to_address,
+        token: transfer.address,
+        function: transactionDefiData.function,
+        amount: Moralis.Units.FromWei(
+          inputData.args[transactionDefiData.argument],
+          transactionDefiData.decimals,
+        ),
+      }
+    }),
   )
   return defiTransactions.filter(transaction => !!transaction) as DefiTransaction[]
 }
