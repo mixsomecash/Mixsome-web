@@ -78,30 +78,28 @@ export const getTokenBalances = async (
   }
 
   const erc20BalancesWithPrices = await Promise.all(
-    erc20TokenBalances.map(
-      async (token): Promise<GenericTokenBalance> => {
-        const tokenPrice = await Moralis.Web3API.token
-          .getTokenPrice({
-            address: token.token_address,
-            chain: chainId as '0x1' | '0x38',
-          })
-          .catch(() => null)
-
-        return {
+    erc20TokenBalances.map(async (token): Promise<GenericTokenBalance> => {
+      const tokenPrice = await Moralis.Web3API.token
+        .getTokenPrice({
           address: token.token_address,
-          image:
-            token.logo ||
-            coinsMarketData?.find(coin => coin.symbol.toLowerCase() === token.symbol.toLowerCase())
-              ?.image ||
-            'https://etherscan.io/images/main/empty-token.png',
-          name: token.name,
-          symbol: token.symbol,
-          decimals: parseFloat(token.decimals),
-          amount: token.balance,
-          price: tokenPrice?.usdPrice || 0,
-        }
-      },
-    ),
+          chain: chainId as '0x1' | '0x38',
+        })
+        .catch(() => null)
+
+      return {
+        address: token.token_address,
+        image:
+          token.logo ||
+          coinsMarketData?.find(coin => coin.symbol.toLowerCase() === token.symbol.toLowerCase())
+            ?.image ||
+          'https://etherscan.io/images/main/empty-token.png',
+        name: token.name,
+        symbol: token.symbol,
+        decimals: parseFloat(token.decimals),
+        amount: token.balance,
+        price: tokenPrice?.usdPrice || 0,
+      }
+    }),
   )
 
   return [nativeTokenBalanceWithPrice, ...erc20BalancesWithPrices]
