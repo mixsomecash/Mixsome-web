@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import { useMoralis } from 'react-moralis'
 
@@ -11,10 +11,11 @@ import ChainsDropdown from './ChainsDropdown'
 import { AppContext } from '../../AppContext'
 
 const Navigation = () => {
-  const { authenticate, isAuthenticated, logout } = useMoralis()
+  const { Moralis, isAuthenticated, isInitialized, authenticate, logout } = useMoralis()
   const { account, setAccount } = useContext(AppContext)
 
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
+  const [memberCount, setMemberCount] = useState(0)
 
   const getTruncateedAddress = () => {
     if (!account) return null
@@ -75,12 +76,23 @@ const Navigation = () => {
     )
   }
 
+  // Fetch the total member count with a front-end hook
+  const fetchMemberCount = async () => {
+    if (!isInitialized) return
+    const count = await Moralis.Cloud.run('get_nr_users')
+    setMemberCount(count)
+  }
+
+  useEffect(() => {
+    fetchMemberCount()
+  })
+
   const renderStats = () => {
     return (
       <div className="hidden xl:flex-1 xl:justify-end xl:flex">
-        <NavigationInfo title="Active Members" body="359" />
-        <NavigationInfo title="Total Value Locked" body="$54.12M" />
-        <NavigationInfo title="Total Yield Earned" body="$189,188.67" />
+        <NavigationInfo title="Active Members" body={memberCount} />
+        <NavigationInfo title="Total Value Locked" body={0} />
+        <NavigationInfo title="Total Yield Earned" body={0} />
       </div>
     )
   }
@@ -127,9 +139,9 @@ const Navigation = () => {
 
         <div className="flex flex-col flex-1">
           <div className="pt-10">
-            <NavigationInfo inline title="Active Members" body="359" />
-            <NavigationInfo inline title="Total Value Locked" body="$54.12M" />
-            <NavigationInfo inline title="Total Yield Earned" body="$189,188.67" />
+            <NavigationInfo inline title="Active Members" body={memberCount} />
+            <NavigationInfo inline title="Total Value Locked" body={0} />
+            <NavigationInfo inline title="Total Yield Earned" body={0} />
           </div>
 
           <div className="mx-5 pt-20">

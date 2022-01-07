@@ -16,14 +16,8 @@ const useChain = () => {
       if (switchError.code === CHAIN_DOES_NOT_EXIST_ERROR_CODE) {
         try {
           const config = networkConfigs[chainIdString]
-          const {
-            chainId,
-            chainName,
-            currencyName,
-            currencySymbol,
-            rpcUrl,
-            blockExplorerUrl,
-          } = config
+          const { chainId, chainName, currencyName, currencySymbol, rpcUrl, blockExplorerUrl } =
+            config
           await Moralis.Web3.addNetwork(
             chainId,
             chainName,
