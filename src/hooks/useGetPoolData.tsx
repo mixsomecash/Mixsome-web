@@ -6,6 +6,7 @@ import { AppContext } from 'AppContext'
 import { useMoralis, useMoralisCloudFunction } from 'react-moralis'
 import { AbiItem } from 'web3-utils'
 import tokenContractAbi from 'utils/StakingPool.json'
+import { stdout } from 'process'
 
 const useGetPoolData = (address: string) => {
   const { account } = useContext(AppContext)

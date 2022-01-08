@@ -70,6 +70,7 @@ const Sidebar = () => {
             {renderComingSoonBadge()}
           </div>
           {renderLink('Flows', '/')}
+          {renderLink('Wallet', '/wallet')}
         </nav>
         <div className="hidden lg:block mt-auto mx-5 mb-32 pb-5">
           {renderSocialLinks()}
