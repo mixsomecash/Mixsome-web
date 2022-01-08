@@ -1,6 +1,7 @@
 import React from 'react'
+import { useMoralis } from 'react-moralis'
 import { Currency } from 'constants/currency'
-import { LinkWithArrow } from 'components'
+import { LinkWithArrow, ErrorMessage } from 'components'
 import Pool from './Pool'
 import { PoolInfo } from './Pool/types'
 
@@ -18,6 +19,12 @@ const pools: Array<PoolInfo> = [
 ]
 
 const Pools = () => {
+  const { isAuthenticated, account } = useMoralis()
+
+  if (!isAuthenticated || !account) {
+    return <ErrorMessage message="Please connect to your wallet" />
+  }
+
   return (
     <div className="flex flex-col w-full">
       <div className="w-full xl:px-10 pb-10 xl:flex xl:mt-8">
