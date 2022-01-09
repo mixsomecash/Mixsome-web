@@ -39,7 +39,7 @@ const Portfolio = ({ onNetWorthChange }: Props) => {
     })()
   }, [account, chainId, onNetWorthChange])
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !account || !chainId) {
     return <ErrorMessage message="Please connect to your wallet" />
   }
 
