@@ -1,3 +1,4 @@
+@import '~antd/dist/antd.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -62,10 +63,6 @@ body {
 
 .flow__container:hover .flow__select-pointer {
   @apply pl-8;
-}
-
-.pool__container {
-  min-width: 300px;
 }
 
 .burger-button div {
@@ -178,10 +175,29 @@ tbody td {
   left: 0px;
 }
 
+/* Dex nav title is bold on the wire frame.. */
+.dex-nav {
+  font-weight: 900;
+}
+
+/* Dev page styles.. */
+.dex-card {
+  width: 430px;
+  box-shadow: 0 0.5rem 1.2rem rgb(189 197 209 / 20%);
+  border: 1px solid #e7eaf3;
+  border-radius: 1rem;
+  font-size: 16px;
+  font-weight: 500;
+}
+
 .dropdown {
   min-width: 200px;
 }
 
 .dropdown__singleValue {
   grid-area: 1/1/2/3;
+}
+
+.chart__container {
+  height: 350px
 }

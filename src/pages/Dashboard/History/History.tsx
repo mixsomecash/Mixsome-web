@@ -29,7 +29,7 @@ const History = () => {
     setAllTransfers(combinedTransfers)
   }, [erc20Data, nftData])
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !account || !chainId) {
     return <ErrorMessage message="Please connect to your wallet" />
   }
 

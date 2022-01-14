@@ -1,79 +1,75 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
+import { Menu } from 'antd'
 
-import { Badge } from 'components'
-import classNames from 'classnames'
-
-const Sidebar = () => {
+const Sidebar: React.FC = () => {
   const location = useLocation()
 
-  const renderComingSoonBadge = () => (
-    <div className="ml-auto">
-      <Badge type="white" text="Coming soon" size="small" />
-    </div>
-  )
-
-  const renderSocialLinks = () => (
-    <div className="mb-5 w-full flex">
-      <a className="hover:underline" target="_blank" rel="noreferrer" href="https://t.me/mixsome">
-        Telegram
+  const renderSocialLinks = (key: string, name: string, link: string) => (
+    <Menu.Item key={key}>
+      <a href={link} rel="noreferrer" target="_blank">
+        {name}
       </a>
-      <a
-        className="mx-auto hover:underline"
-        target="_blank"
-        rel="noreferrer"
-        href="https://twitter.com/mixsomecash"
-      >
-        Twitter
-      </a>
-      <a
-        className="hover:underline"
-        target="_blank"
-        rel="noreferrer"
-        href="https://mixsome-cash.medium.com/"
-      >
-        Medium
-      </a>
-    </div>
+    </Menu.Item>
   )
 
   const renderCopy = () => (
-    <p className="text-14 text-light">
+    <p className="text-14 text-light" style={{ marginTop: 6 }}>
       &copy; {new Date().getFullYear()} Mixsome. All rights reserved.
     </p>
   )
 
-  const renderLink = (name: string, link: string) => {
+  const renderLink = (name: string, link: string, key: string) => {
     const isActive = location.pathname === link
-    const classes = classNames(
-      'w-full border-b silver-border py-4 pr-5 px-5 lg:px-10 lg:pr-10 text-14 lg:text-16 font-regular',
-      { 'pl-10 lg:pl-14 bg-silver': isActive },
-    )
 
     return (
-      <div className={classes}>
-        <a className="hover:underline" href={link}>
+      <Menu.Item
+        style={{
+          height: 60,
+          paddingLeft: isActive ? '40px' : '30px',
+          backgroundColor: isActive ? '#fafafa' : undefined,
+          fontWeight: key === 'dex' ? 'bold' : undefined,
+        }}
+        key={key}
+        disabled={key === 'bridge'}
+      >
+        <a href={link} rel="noopener noreferrer">
           {name}
+          {key === 'bridge' && (
+            <span
+              style={{
+                backgroundColor: '#fafafa',
+                borderRadius: '30%',
+                fontSize: 14,
+                padding: '4px 8px',
+                marginLeft: 16,
+              }}
+            >
+              Coming soon
+            </span>
+          )}
         </a>
-      </div>
+      </Menu.Item>
     )
   }
 
   return (
     <div className="relative lg:fixed w-full lg:w-1/5 lg:min-h-screen inset-0 lg:top-32 border-r silver-border">
       <div className="flex flex-col h-full">
-        <nav>
-          {renderLink('Dashboard', '/dashboard')}
-          {renderLink('Pools', '/pools')}
-          <div className="w-full border-b silver-border py-4 px-5 lg:px-10 text-14 lg:text-16 font-regular flex items-center">
-            <span className="opacity-40">Bridge</span>
-            {renderComingSoonBadge()}
-          </div>
-          {renderLink('Flows', '/')}
-          {renderLink('Wallet', '/wallet')}
-        </nav>
+        <Menu mode="inline" style={{ width: '100%', fontSize: 16 }}>
+          {renderLink('Dashboard', '/dashboard', 'dashboard')}
+          {renderLink('Pools', '/pools', 'pools')}
+          {renderLink('Bridge ', '#', 'bridge')}
+          {renderLink('Flows', '/', 'flows')}
+          {renderLink('DEX', '/1inch', 'dex')}
+          {renderLink('Wallet', '/wallet', 'wallet')}
+        </Menu>
         <div className="hidden lg:block mt-auto mx-5 mb-32 pb-5">
-          {renderSocialLinks()}
+          <Menu mode="horizontal">
+            {renderSocialLinks('telegram', 'Telegram', 'https://t.me/mixsome')}
+            {renderSocialLinks('twitter', 'Twitter', 'https://twitter.com/mixsomecash')}
+            {renderSocialLinks('medium', 'Medium', 'https://mixsome-cash.medium.com/')}
+          </Menu>
           {renderCopy()}
         </div>
       </div>

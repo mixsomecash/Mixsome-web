@@ -3,7 +3,6 @@ import { useGetApproval, useGetPoolData, useGetApprovalStatus } from 'hooks'
 import { Button, Modal, InvestInput } from 'components'
 import { useMoralis } from 'react-moralis'
 import { AppContext } from 'AppContext'
-import { PoolModel } from 'types/models'
 
 type Props = {
   isVisible: boolean
@@ -55,7 +54,11 @@ const StakeModal = ({ isVisible, address, crypto, onClose }: Props) => {
       <div className="flex flex-col justify-center items-center ">
         <p className="text-14 xl:text-16 leading-42 opacity-60 mb-5">Mainnet</p>
         <div className="mb-5">
-          <InvestInput onValueChange={handleValueChange} />
+          <InvestInput
+            onValueChange={handleValueChange}
+            symbol="SOME"
+            iconUrl="/images/currencies/mixsome.png"
+          />
         </div>
         <div className="flex">
           <Button text="Approve" onClick={handleApproveButtonClick} />
