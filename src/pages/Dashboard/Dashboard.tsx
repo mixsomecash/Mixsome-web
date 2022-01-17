@@ -6,6 +6,7 @@ import Portfolio from './Portfolio'
 import NFTs from './NFTs'
 import History from './History'
 import Defi from './Defi'
+import Transfer from './Transfer'
 
 import { DashboardTab, DashboardNetwork } from './types'
 
@@ -26,6 +27,10 @@ const tabs = [
     id: DashboardTab.Defi,
     title: 'DeFi',
   },
+  {
+    id: DashboardTab.Wallet,
+    title: 'Wallet',
+  },
 ]
 
 const networks = [
@@ -41,7 +46,7 @@ const networks = [
   },
 ]
 
-const Dashboard = () => {
+const Dashboard: React.FC = () => {
   const [activeTabId, setActiveTabId] = useState(DashboardTab.Portfolio)
   const [selectedNetworkId, setSelectedNetworkId] = useState(DashboardNetwork.Ethereum)
   const [netWorth, setNetWorth] = useState<number | string | null>(null)
@@ -89,6 +94,8 @@ const Dashboard = () => {
         return <History />
       case DashboardTab.Defi:
         return <Defi networkId={selectedNetworkId} />
+      case DashboardTab.Wallet:
+        return <Transfer />
       default:
         return null
     }

@@ -3,6 +3,7 @@ export enum DashboardTab {
   NFTs = 2,
   History = 3,
   Defi = 4,
+  Wallet = 5,
 }
 
 export enum DashboardNetwork {
