@@ -1,50 +1,51 @@
 import { Moralis } from 'moralis'
-import { ethers } from 'ethers'
 import { ChainId } from 'types/moralis'
-import { contracts } from 'data/defi/contracts'
 import { DefiTransaction } from './types'
+
+const EXCLUDED_FUNCTIONS = [
+  'transfer',
+  'approve',
+  'swapETHForExactTokens',
+  'swapExactETHForTokens',
+  'swapExactTokensForETH',
+  'swapExactTokensForTokens',
+  'swapTokensForExactETH',
+  'swapTokensForExactTokens',
+]
+
+const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
 
 export const getDefiTransactions = async (
   accountAddress: string,
   chainId: ChainId,
 ): Promise<DefiTransaction[] | null> => {
-  const transfers = (await Moralis.Web3API.account
-    .getTokenTransfers({ chain: chainId, address: accountAddress })
-    .catch(() => null)) as any
-  if (!transfers.result) {
+  const transactions = await Moralis.Web3API.account
+    .getTransactions({ chain: chainId, address: accountAddress })
+    .catch(() => null)
+  if (!transactions?.result) {
     return null
   }
   const defiTransactions = await Promise.all(
-    transfers.result.map(async (transfer): Promise<DefiTransaction | null> => {
-      const transaction = await Moralis.Web3API.native
-        .getTransaction({ transaction_hash: transfer.transaction_hash, chain: chainId })
-        .catch(() => null)
-      if (!transaction) {
+    transactions.result.map(async transaction => {
+      const signatureBytesString = transaction.input.substring(2, 10)
+      if (signatureBytesString.length !== 8) {
         return null
       }
-      const transactionDefiData = contracts[transaction.to_address]
-      if (!transactionDefiData) {
+      const signatureResponse = await fetch(`${SIGNATURES_URL}${signatureBytesString}`)
+      if (!signatureResponse.ok) {
         return null
       }
-      const { abi } = transactionDefiData
-      const contractInterface = new ethers.utils.Interface(abi)
-      const inputData = contractInterface.parseTransaction({ data: transaction.input })
-      if (
-        !inputData ||
-        inputData.name !== transactionDefiData.function ||
-        !inputData.args[transactionDefiData.argument]
-      ) {
+      const signature = await signatureResponse.text()
+      const functionName = signature.split('(')[0]
+      if (functionName.length === 0 || EXCLUDED_FUNCTIONS.includes(functionName)) {
         return null
       }
+
       return {
         transactionHash: transaction.hash,
         contractAddress: transaction.to_address,
-        token: transfer.address,
-        function: transactionDefiData.function,
-        amount: Moralis.Units.FromWei(
-          inputData.args[transactionDefiData.argument],
-          transactionDefiData.decimals,
-        ),
+        functionName,
+        timestamp: transaction.block_timestamp,
       }
     }),
   )

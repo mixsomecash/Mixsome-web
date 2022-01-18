@@ -32,16 +32,12 @@ const Defi = () => {
       render: (transaction: DefiTransaction) => getEllipsisText(transaction.contractAddress),
     },
     {
-      title: 'Token',
-      render: (transaction: DefiTransaction) => getEllipsisText(transaction.token),
-    },
-    {
       title: 'Function',
-      render: (transaction: DefiTransaction) => transaction.function,
+      render: (transaction: DefiTransaction) => transaction.functionName,
     },
     {
-      title: 'Amount',
-      render: (transaction: DefiTransaction) => transaction.amount,
+      title: 'Date',
+      render: (transaction: DefiTransaction) => new Date(transaction.timestamp).toUTCString(),
     },
     {
       title: 'Transaction',
