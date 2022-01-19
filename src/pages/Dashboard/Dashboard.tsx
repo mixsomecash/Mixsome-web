@@ -92,10 +92,10 @@ const Dashboard: React.FC = () => {
         return <NFTs networkId={selectedNetworkId} />
       case DashboardTab.History:
         return <History />
-      case DashboardTab.Defi:
-        return <Defi networkId={selectedNetworkId} />
       case DashboardTab.Wallet:
         return <Transfer />
+      case DashboardTab.Defi:
+        return <Defi />
       default:
         return null
     }
