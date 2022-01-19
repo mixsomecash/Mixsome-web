@@ -8,7 +8,7 @@ import { Blockie } from './Blockie'
 import { Cross } from './Cross'
 
 type OnChange = {
-  (value: any): void
+  (value: string | undefined): void
 }
 
 interface AddressInputProps {

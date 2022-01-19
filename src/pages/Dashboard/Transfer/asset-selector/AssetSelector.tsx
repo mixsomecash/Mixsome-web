@@ -1,40 +1,25 @@
-import React, { useMemo } from 'react'
-import { useMoralis, useNativeBalance } from 'react-moralis'
+import React from 'react'
+import { useMoralis } from 'react-moralis'
 import { Image, Select } from 'antd'
 
-import { useERC20Balance } from 'hooks/useERC20Balance'
+import type { Erc20Token } from 'types/models/wallet'
 
 type SetAsset = {
-  (value: any): void
+  (value: Erc20Token | undefined): void
 }
 
 interface AssetSelectorProps {
+  asset: Erc20Token | undefined
+  assets: Erc20Token[]
   setAsset: SetAsset
 }
 
 export const AssetSelector: React.FC<AssetSelectorProps> = (props: AssetSelectorProps) => {
-  const { setAsset } = props
+  const { asset, assets, setAsset } = props
   const { Moralis } = useMoralis()
-  const { assets } = useERC20Balance()
-  const { data: nativeBalance, nativeToken } = useNativeBalance()
-
-  const fullBalance = useMemo(() => {
-    if (!assets || !nativeBalance || !nativeToken) return []
-    return [
-      ...assets,
-      {
-        balance: nativeBalance.balance,
-        decimals: nativeToken.decimals,
-        logo: null,
-        name: nativeToken.name,
-        symbol: nativeToken.symbol,
-        token_address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      },
-    ]
-  }, [assets, nativeBalance, nativeToken])
 
   const handleChange = value => {
-    const selectedToken = fullBalance?.find(token => token.symbol === value)
+    const selectedToken = assets?.find(token => token.symbol === value)
     setAsset(selectedToken)
   }
 
@@ -43,10 +28,11 @@ export const AssetSelector: React.FC<AssetSelectorProps> = (props: AssetSelector
       onChange={handleChange}
       size="large"
       placeholder="Select a token"
+      value={asset?.name}
       style={{ width: '100%' }}
     >
-      {fullBalance &&
-        fullBalance.map(item => (
+      {assets &&
+        assets.map(item => (
           <Select.Option value={item.symbol} key={item.symbol}>
             <div
               style={{

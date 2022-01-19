@@ -1,40 +1,56 @@
-import React, { useState, useEffect } from 'react'
-import { useMoralis } from 'react-moralis'
+import React, { useState, useEffect, useMemo } from 'react'
+import { useNativeBalance } from 'react-moralis'
 import { CreditCardOutlined } from '@ant-design/icons'
-import { Input } from 'antd'
+import { Button, Card, Input, Skeleton } from 'antd'
 import Text from 'antd/lib/typography/Text'
 
+import type { Erc20Token, Transaction } from 'types/models/wallet'
+
+import { useERC20Balance } from 'hooks/useERC20Balance'
 import { AddressInput } from './address-input/AddressInput'
 import { AssetSelector } from './asset-selector/AssetSelector'
+import { Title } from './title/Title'
 import { TransferComponent } from './transfer-component/TransferComponent'
 
 const Transfer: React.FC = () => {
-  const { enableWeb3, isWeb3Enabled, web3EnableError } = useMoralis()
-
-  if (!isWeb3Enabled) enableWeb3()
-
-  const [asset, setAsset] = useState<any>(null)
-  const [amount, setAmount] = useState<any>(null)
-  const [receiver, setReceiver] = useState<any>(null)
-  const [tx, setTx] = useState<any>(null)
+  const { assets, error, isLoading } = useERC20Balance()
+  const { data: nativeBalance, nativeToken } = useNativeBalance()
+  const [asset, setAsset] = useState<Erc20Token | undefined>(undefined)
+  const [receiver, setReceiver] = useState<string | undefined>(undefined)
+  const [amount, setAmount] = useState<string | undefined>(undefined)
+  const [tx, setTx] = useState<Transaction | undefined>(undefined)
   const [isPending, setIsPending] = useState<boolean>(false)
+
+  const fullBalance = useMemo(() => {
+    if (!assets || !nativeBalance || !nativeToken) return []
+    return [
+      ...assets,
+      {
+        balance: nativeBalance.balance,
+        decimals: nativeToken.decimals,
+        logo: null,
+        name: nativeToken.name,
+        symbol: nativeToken.symbol,
+        thumbnail: null,
+        token_address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      },
+    ]
+  }, [assets, nativeBalance, nativeToken])
 
   useEffect(() => {
     if (asset && amount && receiver) {
       setTx({ amount, receiver, asset })
     } else {
-      setTx(null)
+      setTx(undefined)
     }
   }, [amount, asset, receiver])
 
-  return (
-    <div style={{ alignItems: 'center', width: '100%' }}>
-      <div>
-        <div style={{ textAlign: 'center' }}>
-          <h3>Transfer Assets</h3>
-        </div>
+  if (error) return <p>{error}</p>
 
-        <AddressInput autoFocus onChange={setReceiver} />
+  return (
+    <Card title={<Title text="Transfer Assets" />}>
+      <Skeleton loading={isLoading}>
+        <AddressInput autoFocus onChange={setReceiver} placeholder="Enter address.." />
 
         <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
           <div style={{ maxWidth: '80px', width: '100%' }}>
@@ -43,6 +59,7 @@ const Transfer: React.FC = () => {
           <Input
             size="large"
             prefix={<CreditCardOutlined />}
+            placeholder="Enter amount.."
             onChange={event => {
               setAmount(event.target.value)
             }}
@@ -53,16 +70,18 @@ const Transfer: React.FC = () => {
           <div style={{ maxWidth: '80px', width: '100%' }}>
             <Text strong>Asset:</Text>
           </div>
-          <AssetSelector setAsset={setAsset} />
+          <AssetSelector asset={asset} assets={fullBalance} setAsset={setAsset} />
         </div>
 
-        {web3EnableError && <p style={{ color: 'red' }}>Could not enable Web3 services!</p>}
-
-        {isWeb3Enabled && tx && (
+        {tx ? (
           <TransferComponent isPending={isPending} setIsPending={setIsPending} tx={tx} />
+        ) : (
+          <Button type="primary" size="large" style={{ width: '100%', marginTop: '25px' }} disabled>
+            Transfer💸
+          </Button>
         )}
-      </div>
-    </div>
+      </Skeleton>
+    </Card>
   )
 }
 

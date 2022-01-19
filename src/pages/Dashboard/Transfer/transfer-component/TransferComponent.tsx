@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useMoralis } from 'react-moralis'
 import { Button, notification } from 'antd'
+
+import type { Transaction } from 'types/models/wallet'
 
 type SetIsPending = {
   (value: boolean): void
@@ -9,7 +11,7 @@ type SetIsPending = {
 interface TransferComponentProps {
   isPending: boolean
   setIsPending: SetIsPending
-  tx: any
+  tx: Transaction
 }
 
 export const TransferComponent: React.FC<TransferComponentProps> = (
@@ -17,7 +19,11 @@ export const TransferComponent: React.FC<TransferComponentProps> = (
 ) => {
   const { isPending, setIsPending, tx } = props
 
-  const { Moralis } = useMoralis()
+  const { Moralis, enableWeb3, isWeb3Enabled } = useMoralis()
+
+  useEffect(() => {
+    if (!isWeb3Enabled) enableWeb3()
+  }, [enableWeb3, isWeb3Enabled])
 
   const openNotification = ({ message, description }) => {
     notification.open({
