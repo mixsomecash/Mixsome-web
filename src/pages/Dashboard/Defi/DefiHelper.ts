@@ -4,13 +4,13 @@ import { DefiTransaction } from './types'
 
 const EXCLUDED_FUNCTIONS = [
   'transfer',
-  'approve',
   'swapETHForExactTokens',
   'swapExactETHForTokens',
   'swapExactTokensForETH',
   'swapExactTokensForTokens',
   'swapTokensForExactETH',
   'swapTokensForExactTokens',
+  'swap',
 ]
 
 const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
