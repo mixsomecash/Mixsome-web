@@ -17,7 +17,7 @@ const Portfolio = ({ onNetWorthChange }: Props) => {
   const [tokenBalances, setTokenBalances] = useState<GenericTokenBalance[] | null>(null)
 
   useEffect(() => {
-    if (!account || !chainId) {
+    if (!account || !chainId || !isAuthenticated) {
       return
     }
     ;(async () => {
@@ -37,7 +37,7 @@ const Portfolio = ({ onNetWorthChange }: Props) => {
       }
       setIsLoading(false)
     })()
-  }, [account, chainId, onNetWorthChange])
+  }, [account, chainId, isAuthenticated, onNetWorthChange])
 
   if (!isAuthenticated || !account || !chainId) {
     return <ErrorMessage message="Please connect to your wallet" />
