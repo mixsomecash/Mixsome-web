@@ -1,7 +1,6 @@
 import Web3 from 'web3'
 import { ethers, Contract } from 'ethers'
 import axios from 'axios'
-import { useGetApproval, useGetPoolData, useGetApprovalStatus } from 'hooks'
 
 import { config } from 'config'
 

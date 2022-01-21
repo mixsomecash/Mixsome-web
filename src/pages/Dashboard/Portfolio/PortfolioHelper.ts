@@ -9,7 +9,7 @@ export type GenericTokenBalance = {
   name: string
   symbol: string
   decimals: number
-  amount: number | string
+  amount: number
   price: number
 }
 
@@ -73,7 +73,7 @@ export const getTokenBalances = async (
     name: nativeTokenMarketData.name,
     symbol: nativeTokenMarketData.symbol,
     decimals: currentNetwork.decimals,
-    amount: nativeTokenBalance.balance ?? '0',
+    amount: parseFloat(nativeTokenBalance.balance) ?? 0,
     price: nativeTokenMarketData.current_price || 0,
   }
 
@@ -96,7 +96,7 @@ export const getTokenBalances = async (
         name: token.name,
         symbol: token.symbol,
         decimals: parseFloat(token.decimals),
-        amount: token.balance,
+        amount: parseFloat(token.balance),
         price: tokenPrice?.usdPrice || 0,
       }
     }),

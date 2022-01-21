@@ -1,18 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useERC20Transfers, useNFTTransfers, useMoralis } from 'react-moralis'
-import { AppContext } from 'AppContext'
 import { ErrorMessage, Loader } from 'components'
 import { getEllipsisText } from 'utils/formatters'
 import { getExplorer } from 'utils/networks'
 import { GenericTransfer, erc20ToGenericTransfer, nftToGenericTransfer } from './HistoryHelper'
 
 const History = () => {
-  const { account } = useContext(AppContext)
-  const { Moralis, chainId, isAuthenticated } = useMoralis()
+  const { Moralis, chainId, isAuthenticated, account } = useMoralis()
   const { data: erc20Data, isLoading: isLoadingERC20 } = useERC20Transfers({
-    address: account?.address,
+    address: account ?? undefined,
   })
-  const { data: nftData, isLoading: isLoadingNFT } = useNFTTransfers({ address: account?.address })
+  const { data: nftData, isLoading: isLoadingNFT } = useNFTTransfers({
+    address: account ?? undefined,
+  })
 
   const [allTransfers, setAllTransfers] = useState<GenericTransfer[] | null>(null)
 

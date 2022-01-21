@@ -1,29 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import { useMoralis } from 'react-moralis'
-
 import { Button } from 'components'
-import { getAccountData } from 'clients/ethereum'
 import { config } from 'config'
-
+import { getEllipsisText } from 'utils/formatters'
 import NavigationInfo from './NavigationInfo'
 import ChainsDropdown from './ChainsDropdown'
-import { AppContext } from '../../AppContext'
 
 const Navigation = () => {
-  const { Moralis, isAuthenticated, isInitialized, authenticate, logout } = useMoralis()
-  const { account, setAccount } = useContext(AppContext)
+  const { Moralis, account, isAuthenticated, isInitialized, authenticate, logout } = useMoralis()
 
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
   const [memberCount, setMemberCount] = useState(0)
-
-  const getTruncateedAddress = () => {
-    if (!account) return null
-
-    const { address } = account
-
-    return `${address?.substring(0, 6)}...${address?.substring(address.length - 4)}`
-  }
 
   const handleBurgerIconClick = () => {
     setIsMobileMenuVisible(state => !state)
@@ -31,14 +19,9 @@ const Navigation = () => {
 
   const handleConnectClick = async () => {
     await authenticate()
-
-    const connectedAccount = await getAccountData()
-
-    if (setAccount && connectedAccount) setAccount(connectedAccount)
   }
 
   const handleDisconnectClick = () => {
-    if (setAccount) setAccount(null)
     logout()
   }
 
@@ -58,14 +41,11 @@ const Navigation = () => {
   }
 
   const renderWalletInfo = () => {
-    if (!account) return null
-
-    const { address } = account
-
+    if (!account || !isAuthenticated) return null
     return (
       <div className="xl:justify-end flex min-w-max items-center">
-        <Jazzicon diameter={64} seed={jsNumberForAddress(address)} />
-        <span className="pl-4 font-bold text-base">{getTruncateedAddress()}</span>
+        <Jazzicon diameter={64} seed={jsNumberForAddress(account)} />
+        <span className="pl-4 font-bold text-base">{getEllipsisText(account)}</span>
         <div className="ml-5 hidden lg:block">
           <Button text="Disconnect" onClick={handleDisconnectClick} />
         </div>
@@ -76,7 +56,6 @@ const Navigation = () => {
     )
   }
 
-  // Fetch the total member count with a front-end hook
   const fetchMemberCount = async () => {
     if (!isInitialized) return
     const count = await Moralis.Cloud.run('get_nr_users')
@@ -100,7 +79,7 @@ const Navigation = () => {
   const renderUserInfo = () => {
     return (
       <div className="hidden xl:block">
-        {isAuthenticated ? renderWalletInfo() : renderConnectButton()}
+        {isAuthenticated && account ? renderWalletInfo() : renderConnectButton()}
       </div>
     )
   }
@@ -148,7 +127,6 @@ const Navigation = () => {
             {account ? (
               <div className="flex justify-center items-center">
                 <div className="flex-1">{renderWalletInfo()}</div>
-                <div className="font-mono text-16 leading-22">{account.balance} ETH</div>
               </div>
             ) : (
               <Button text="Connect to wallet" invert fullWidth onClick={handleConnectClick} />
