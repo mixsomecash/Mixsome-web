@@ -9,7 +9,7 @@ import CurrencyIcon from '../../CurrencyIcon'
 
 const ChainsDropdown = () => {
   const { chainId } = useMoralis()
-  const chain = useChain()
+  const { switchNetwork } = useChain()
 
   const renderCurrencyIcon = (currency: Currency) => {
     const iconUrl = `/images/currencies/${getCurrencyIconFileName(currency)}`
@@ -17,7 +17,7 @@ const ChainsDropdown = () => {
   }
 
   const handleOptionClick = async (option: IconOption) => {
-    await chain.switchNetwork(option.key)
+    await switchNetwork(option.key)
   }
 
   const options: IconOption[] = [

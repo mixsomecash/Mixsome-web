@@ -1,8 +1,6 @@
 import React, { FormEvent, useContext } from 'react'
-import { useGetApproval, useGetPoolData, useGetApprovalStatus } from 'hooks'
 
 import CurrencyIcon from 'components/CurrencyIcon'
-import { AppContext } from 'AppContext'
 
 type Props = {
   symbol: string

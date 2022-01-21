@@ -1,5 +1,7 @@
 import { Moralis } from 'moralis'
-import tokenContractAbi from 'utils/StakingPool.json'
+import { MoralisToken } from 'types/moralis'
+import poolAbi from 'utils/StakingPool.json'
+import tokenAbi from 'utils/ERC20.json'
 import { AbiItem } from 'web3-utils'
 import { PoolContractData, PoolInfo } from './types'
 
@@ -9,7 +11,7 @@ const runPoolContractFunction = async (poolInfo: PoolInfo, functionName: string,
     .runContractFunction({
       address: poolInfo.address,
       chain: poolInfo.chainId,
-      abi: tokenContractAbi,
+      abi: poolAbi,
       function_name: functionName,
       params,
     } as any)
@@ -66,10 +68,48 @@ export const getPoolContractData = async (
 }
 
 export const withdrawTokens = async (poolInfo: PoolInfo, account: string) => {
-  const connector = await Moralis.Web3.enableWeb3()
-  const pool = new connector.eth.Contract(tokenContractAbi as AbiItem[], poolInfo.address)
+  const connector = await (Moralis as any).enableWeb3()
+  const pool = new connector.eth.Contract(poolAbi as AbiItem[], poolInfo.address)
   await pool.methods.withdraw().send({ from: account })
 }
+
+export const approveTokens = async (
+  poolInfo: PoolInfo,
+  poolToken: MoralisToken,
+  account: string,
+) => {
+  try {
+    const connector = await Moralis.Web3.enableWeb3()
+    const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], poolToken.address)
+    await tokenContract.methods
+      .approve(poolInfo.address, '1157920892373161954235709850086879078')
+      .send({ from: account })
+    return true
+  } catch {
+    return false
+  }
+}
+
+export const stakeTokens = async (poolInfo: PoolInfo, amount: number, account: string) => {
+  try {
+    const connector = await Moralis.Web3.enableWeb3()
+    const tokenContract = new connector.eth.Contract(poolAbi as AbiItem[], poolInfo.address)
+    await tokenContract.methods.stake(amount).send({ from: account })
+    return true
+  } catch {
+    return false
+  }
+}
+
+export const getPoolLaunchDate = (poolContractData: PoolContractData) =>
+  new Date(poolContractData.launchTime * 1000)
+
+export const getPoolClosingDate = (poolContractData: PoolContractData) =>
+  new Date(poolContractData.closingTime * 1000)
+
+export const isPoolOpen = (poolContractData: PoolContractData) =>
+  Date.now() > getPoolLaunchDate(poolContractData).getTime() &&
+  Date.now() < getPoolClosingDate(poolContractData).getTime()
 
 export const getAccountMaturityDate = (poolContractData: PoolContractData) => {
   if (poolContractData.accountStakedTime === 0) {
