@@ -73,6 +73,17 @@ export const withdrawTokens = async (poolInfo: PoolInfo, account: string) => {
   await pool.methods.withdraw().send({ from: account })
 }
 
+export const checkAllowance = async (
+  poolInfo: PoolInfo,
+  poolToken: MoralisToken,
+  account: string,
+) => {
+  const connector = await Moralis.Web3.enableWeb3()
+  const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], poolToken.address)
+  const result = await tokenContract.methods.allowance(account, poolInfo.address).call()
+  return result !== '0'
+}
+
 export const approveTokens = async (
   poolInfo: PoolInfo,
   poolToken: MoralisToken,
@@ -90,11 +101,18 @@ export const approveTokens = async (
   }
 }
 
-export const stakeTokens = async (poolInfo: PoolInfo, amount: number, account: string) => {
+export const stakeTokens = async (
+  poolInfo: PoolInfo,
+  poolContractData: PoolContractData,
+  amount: number,
+  account: string,
+) => {
   try {
     const connector = await Moralis.Web3.enableWeb3()
+    const amountWei = amount * 10 ** parseFloat(poolContractData.token.decimals)
+    const amountWeiString = amountWei.toLocaleString('fullwide', { useGrouping: false })
     const tokenContract = new connector.eth.Contract(poolAbi as AbiItem[], poolInfo.address)
-    await tokenContract.methods.stake(amount).send({ from: account })
+    await tokenContract.methods.stake(amountWeiString).send({ from: account })
     return true
   } catch {
     return false
@@ -109,10 +127,11 @@ export const getPoolClosingDate = (poolContractData: PoolContractData) =>
 
 export const isPoolOpen = (poolContractData: PoolContractData) =>
   Date.now() > getPoolLaunchDate(poolContractData).getTime() &&
-  Date.now() < getPoolClosingDate(poolContractData).getTime()
+  Date.now() < getPoolClosingDate(poolContractData).getTime() &&
+  poolContractData.poolSize !== poolContractData.stakedTotal
 
 export const getAccountMaturityDate = (poolContractData: PoolContractData) => {
-  if (poolContractData.accountStakedTime === 0) {
+  if (poolContractData.accountStakedTime === 0 || poolContractData.accountStakedTime === null) {
     return null
   }
   return new Date(
