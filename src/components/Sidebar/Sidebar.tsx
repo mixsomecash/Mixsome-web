@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, NavLink } from 'react-router-dom'
 import { Menu } from 'antd'
 
 const Sidebar: React.FC = () => {
@@ -33,7 +33,7 @@ const Sidebar: React.FC = () => {
         key={key}
         disabled={key === 'bridge'}
       >
-        <a href={link} rel="noopener noreferrer">
+        <NavLink to={link}>
           {name}
           {key === 'bridge' && (
             <span
@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
               Coming soon
             </span>
           )}
-        </a>
+        </NavLink>
       </Menu.Item>
     )
   }
