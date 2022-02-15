@@ -9,6 +9,7 @@ import Defi from './Defi'
 import Transfer from './Transfer'
 
 import { DashboardTab, DashboardNetwork } from './types'
+import Approval from './Approval'
 
 const tabs = [
   {
@@ -30,6 +31,10 @@ const tabs = [
   {
     id: DashboardTab.Wallet,
     title: 'Wallet',
+  },
+  {
+    id: DashboardTab.Approval,
+    title: 'Approval',
   },
 ]
 
@@ -96,6 +101,8 @@ const Dashboard: React.FC = () => {
         return <Transfer />
       case DashboardTab.Defi:
         return <Defi />
+      case DashboardTab.Approval:
+        return <Approval />
       default:
         return null
     }
