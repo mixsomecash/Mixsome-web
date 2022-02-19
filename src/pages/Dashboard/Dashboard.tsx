@@ -7,7 +7,7 @@ import NFTs from './NFTs'
 import History from './History'
 import Defi from './Defi'
 import Transfer from './Transfer'
-
+import Approval from './Approval'
 import { DashboardTab, DashboardNetwork } from './types'
 
 const tabs = [
@@ -30,6 +30,10 @@ const tabs = [
   {
     id: DashboardTab.Wallet,
     title: 'Wallet',
+  },
+  {
+    id: DashboardTab.Approval,
+    title: 'Approval',
   },
 ]
 
@@ -96,6 +100,8 @@ const Dashboard: React.FC = () => {
         return <Transfer />
       case DashboardTab.Defi:
         return <Defi />
+      case DashboardTab.Approval:
+        return <Approval />
       default:
         return null
     }
