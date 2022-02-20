@@ -3,7 +3,7 @@ import { Moralis } from 'moralis'
 import { ChainId } from 'types/moralis'
 import { ApprovalTransactions } from './types'
 
-const APPROVE = 'Approve'
+const APPROVE = 'approve'
 
 const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
 const getFunctionName = async (signatureBytesString): Promise<string | null> => {
@@ -17,6 +17,20 @@ const getFunctionName = async (signatureBytesString): Promise<string | null> => 
     return functionName
   } catch (err) {
     return null
+  }
+}
+
+const getAllowance = async (native, chainId) => {
+  try {
+    const { allowance } = await Moralis.Web3API.token.getTokenAllowance({
+      chain: chainId,
+      owner_address: `0x${native.logs[0]?.topic1?.slice(-40)}`,
+      spender_address: `0x${native.logs[0]?.topic2?.slice(-40)}`,
+      address: native.logs[0]?.address,
+    })
+    return allowance
+  } catch (err) {
+    return 'NaN'
   }
 }
 
@@ -56,12 +70,7 @@ export const getApprovals = async (
         contractAddress: transaction.to_address,
         functionName,
         timestamp: transaction.block_timestamp,
-        allowance: await Moralis.Plugins.getAllowans({
-          chainId,
-          ownerAddress: `0x${native.logs[0]?.topic1?.slice(-40)}`,
-          spenderAddress: `0x${native.logs[0]?.topic2?.slice(-40)}`,
-          contractAddress: native.logs[0]?.address,
-        }),
+        allowance: await getAllowance(native, chainId),
       }
     }),
   )
