@@ -1,10 +1,34 @@
+import { CopyOutlined } from '@ant-design/icons'
+import { notification } from 'antd'
 import { ErrorMessage, Loader } from 'components'
 import React, { useEffect, useState } from 'react'
 import { useMoralis } from 'react-moralis'
 import { ChainId } from 'types/moralis'
 import { getEllipsisText } from 'utils/formatters'
-import { getApprovals, revoke } from './ApprovalHelp'
+import { getApprovals, revoke, revokeTokens } from './ApprovalHelp'
 import { ApprovalTransactions } from './types'
+
+const copyToClipboard = text => {
+  if (navigator.clipboard)
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        notification.success({
+          message: 'Copied to clipboard',
+        })
+      })
+      .catch(err => {
+        notification.info({
+          message: 'Error',
+          description: "Can't copy to clipboard",
+        })
+      })
+  else
+    notification.info({
+      message: 'Error',
+      description: "Can't copy to clipboard",
+    })
+}
 
 const Approval = () => {
   const { chainId, account } = useMoralis()
@@ -13,12 +37,51 @@ const Approval = () => {
 
   const columns = [
     {
+      title: '',
+      render: (transaction: ApprovalTransactions) => (
+        <img
+          src={
+            transaction.metadata?.thumbnail || 'https://etherscan.io/images/main/empty-token.png'
+          }
+          alt={transaction.metadata?.name}
+          width="20px"
+          height="20px"
+        />
+      ),
+    },
+    {
       title: 'Contract',
-      render: (transaction: ApprovalTransactions) => getEllipsisText(transaction.contractAddress),
+      render: (transaction: ApprovalTransactions) => (
+        <div
+          onClick={() => copyToClipboard(transaction.contractAddress)}
+          onKeyPress={() => copyToClipboard(transaction.contractAddress)}
+          role="button"
+          tabIndex={0}
+        >
+          {getEllipsisText(transaction.contractAddress)}
+          &nbsp;
+          <CopyOutlined className="text-light align-middle" />
+        </div>
+      ),
     },
     {
       title: 'Date',
       render: (transaction: ApprovalTransactions) => new Date(transaction.timestamp).toUTCString(),
+    },
+    {
+      title: 'Spender',
+      render: (transaction: ApprovalTransactions) => (
+        <div
+          onClick={() => copyToClipboard(transaction.spenderAddress)}
+          onKeyPress={() => copyToClipboard(transaction.spenderAddress)}
+          role="button"
+          tabIndex={0}
+        >
+          {getEllipsisText(transaction.spenderAddress)}
+          &nbsp;
+          <CopyOutlined className="text-light align-middle" />
+        </div>
+      ),
     },
     {
       title: 'Approved Amount',
@@ -31,7 +94,7 @@ const Approval = () => {
         <button
           className="text-black bg-extra-light  hover:bg-light  hover:text-white font-bold py-2 px-4 rounded-full"
           onClick={() => {
-            revoke(account, transaction.contractAddress, chainId as ChainId)
+            revokeTokens(transaction.contractAddress, transaction.spenderAddress,account)
           }}
         >
           Revoke
@@ -41,7 +104,7 @@ const Approval = () => {
   ]
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       if (!account || !chainId) {
         setIsLoading(false)
         return
