@@ -107,6 +107,8 @@ const Approval = () => {
               <div className="py-1" role="none">
                 {chainId === '0x1' && (
                   <a
+                    target="_blank"
+                    rel="noreferrer"
                     href={`https://etherscan.io/tx/${transaction.transactionHash}`}
                     className="text-light hover:text-black block px-4 py-2 text-sm"
                     tabIndex={-1}
@@ -117,6 +119,8 @@ const Approval = () => {
                 )}
                 {chainId === '0x38' && (
                   <a
+                    target="_blank"
+                    rel="noreferrer"
                     href={`https://bscscan.com/tx/${transaction.transactionHash}`}
                     className="text-light hover:text-black block px-4 py-2 text-sm"
                     tabIndex={-1}
