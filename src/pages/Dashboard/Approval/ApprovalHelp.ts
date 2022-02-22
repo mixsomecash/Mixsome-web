@@ -136,12 +136,7 @@ export const revokeTokens = async (
   try {
     const connector = await Moralis.Web3.enableWeb3()
     const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], contract_address)
-    const allowance = await tokenContract.methods
-      .allowance(account, spender_address)
-      .call({ from: account })
-    await tokenContract.methods
-      .decreaseAllowance(spender_address, allowance)
-      .send({ from: account })
+    await tokenContract.methods.approve(spender_address, '0').send({ from: account })
     return true
   } catch {
     return false
