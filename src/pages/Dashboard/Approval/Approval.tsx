@@ -1,4 +1,4 @@
-import { CopyOutlined } from '@ant-design/icons'
+import { CloseOutlined, CopyOutlined, InfoCircleOutlined, MoreOutlined } from '@ant-design/icons'
 import { notification } from 'antd'
 import { ErrorMessage, Loader } from 'components'
 import React, { useEffect, useState } from 'react'
@@ -33,6 +33,7 @@ const copyToClipboard = text => {
 const Approval = () => {
   const { chainId, account } = useMoralis()
   const [isLoading, setIsLoading] = useState(true)
+  const [showActionsDropdown, setShowActionsDropdown] = useState<string>('')
   const [approvals, setApprovals] = useState<ApprovalTransactions[]>([])
 
   const columns = [
@@ -85,26 +86,66 @@ const Approval = () => {
     },
     {
       title: 'Approved Amount',
-      render: (transaction: ApprovalTransactions) => <>{transaction.allowance}</>,
+      render: (transaction: ApprovalTransactions) => transaction.allowance,
     },
     {
-      title: 'Revoke',
+      title: 'Actions',
       render: (transaction: ApprovalTransactions) => (
-        // eslint-disable-next-line react/button-has-type
-        <button
-          className="text-black bg-extra-light  hover:bg-light  hover:text-white font-bold py-2 px-4 rounded-full"
-          onClick={() => {
-            revokeTokens(transaction.contractAddress, transaction.spenderAddress,account)
-          }}
-        >
-          Revoke
-        </button>
+        <>
+          <button
+            onClick={() => setShowActionsDropdown(transaction.transactionHash)}
+            type="button"
+            className="inline-flex justify-center w-full rounded-md  px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+          >
+            <MoreOutlined />
+          </button>
+          {showActionsDropdown === transaction.transactionHash && (
+            <div
+              className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+              role="menu"
+            >
+              <div className="py-1" role="none">
+                {chainId === '0x1' && (
+                  <a
+                    href={`https://etherscan.io/tx/${transaction.transactionHash}`}
+                    className="text-light hover:text-black block px-4 py-2 text-sm"
+                    tabIndex={-1}
+                  >
+                    <InfoCircleOutlined className="align-middle" />
+                    &nbsp;Open In Etherscan
+                  </a>
+                )}
+                {chainId === '0x38' && (
+                  <a
+                    href={`https://bscscan.com/tx/${transaction.transactionHash}`}
+                    className="text-light hover:text-black block px-4 py-2 text-sm"
+                    tabIndex={-1}
+                  >
+                    <InfoCircleOutlined className="align-middle" />
+                    &nbsp;Open In BscScan
+                  </a>
+                )}
+
+                <button
+                  type="button"
+                  className=" text-light hover:text-black block px-4 py-2 text-sm"
+                  onClick={() => {
+                    revokeTokens(transaction.contractAddress, transaction.spenderAddress, account)
+                  }}
+                >
+                  <CloseOutlined className="align-middle" />
+                  &nbsp;Revoke
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       ),
     },
   ]
 
   useEffect(() => {
-    ; (async () => {
+    ;(async () => {
       if (!account || !chainId) {
         setIsLoading(false)
         return
@@ -126,7 +167,7 @@ const Approval = () => {
       </div>
       {isLoading && <Loader />}
       {!isLoading && approvals && approvals.length > 0 && (
-        <div className="scrollable-table-wrapper">
+        <div className="scrollable-table-wrapper" style={{ overflow: 'visible' }}>
           <table className="table-auto w-full xl:mt-4">
             <thead className="border-b border-black border-opacity-20 pb-10">
               <tr>

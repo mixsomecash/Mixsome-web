@@ -103,7 +103,7 @@ export const getApprovals = async (
   const tokenMetadatas = await getTokenMetadata(addresses, chainId)
 
   return approvals
-    .filter(transaction => !!transaction)
+    .filter(transaction => !!transaction && transaction.allowance !== 0)
     .map(transaction => {
       return {
         ...transaction,
