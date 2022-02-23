@@ -110,7 +110,7 @@ export const getApprovals = async (
           inputData.allowance === MAX_APPROVAL_AMOUNT
             ? 'Unlimited'
             : web3.utils.fromWei(web3.utils.hexToNumberString(`0x${inputData.allowance}`), 'ether'),
-        spenderAddress: inputData?.spenderAddress,
+        spenderAddress: `0x${inputData?.spenderAddress}`,
         metadata: null,
       }
     }),
@@ -149,6 +149,7 @@ export const revokeTokens = async (
   account?: string | null,
 ) => {
   try {
+    console.log(contract_address,"spender",spender_address,account)
     const connector = await Moralis.Web3.enableWeb3()
     const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], contract_address)
     await tokenContract.methods.approve(spender_address, '0').send({ from: account })

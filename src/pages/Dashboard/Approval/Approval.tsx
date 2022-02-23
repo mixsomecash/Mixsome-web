@@ -112,7 +112,9 @@ const Approval = () => {
     },
     {
       title: 'Approved Amount',
-      render: (transaction: ApprovalTransactions) => transaction.allowance,
+      render: (transaction: ApprovalTransactions) => (
+        <span className="font-bold">{transaction.allowance}</span>
+      ),
     },
     {
       title: 'Actions',
