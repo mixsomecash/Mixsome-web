@@ -1,4 +1,3 @@
-import { notification } from 'antd'
 import { Moralis } from 'moralis'
 import { ChainId } from 'types/moralis'
 import tokenAbi from 'utils/ERC20.json'
@@ -17,7 +16,6 @@ const getTokenMetadata = async (
       chain: chainId,
       addresses,
     })
-    console.log('meta', metaData)
     return metaData
   } catch (error) {
     return null
@@ -135,6 +133,7 @@ export const revokeTokens = async (
     const connector = await Moralis.Web3.enableWeb3()
     const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], contract_address)
     await tokenContract.methods.approve(spender_address, '0').send({ from: account })
+
     return true
   } catch {
     return false

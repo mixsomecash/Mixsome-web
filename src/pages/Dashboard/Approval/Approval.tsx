@@ -33,7 +33,6 @@ const copyToClipboard = text => {
 const Approval = () => {
   const { chainId, account } = useMoralis()
   const [isLoading, setIsLoading] = useState(true)
-  const [showActionsDropdown, setShowActionsDropdown] = useState<string>('')
   const [approvals, setApprovals] = useState<ApprovalTransactions[]>([])
 
   const columns = [
