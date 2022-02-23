@@ -15,7 +15,6 @@ export type TokenMetadata = {
 export type ApprovalTransactions = {
   transactionHash: string
   contractAddress: string
-  functionName: string
   timestamp: string
   allowance: string
   spenderAddress: string

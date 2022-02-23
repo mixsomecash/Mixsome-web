@@ -5,9 +5,8 @@ import tokenAbi from 'utils/ERC20.json'
 import { AbiItem } from 'web3-utils'
 import { ApprovalTransactions, TokenMetadata } from './types'
 
-const APPROVE = 'approve'
-
-const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
+const APPROVE_SHA3 = '0x095ea7b3'
+// const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
 
 const getTokenMetadata = async (
   addresses: string[],
@@ -25,19 +24,19 @@ const getTokenMetadata = async (
   }
 }
 
-const getFunctionName = async (signatureBytesString): Promise<string | null> => {
-  try {
-    const signatureResponse = await fetch(`${SIGNATURES_URL}${signatureBytesString}`)
-    if (!signatureResponse.ok) {
-      return null
-    }
-    const signature = await signatureResponse.text()
-    const functionName = signature.split('(')[0]
-    return functionName
-  } catch (err) {
-    return null
-  }
-}
+// const getFunctionName = async (signatureBytesString): Promise<string | null> => {
+//   try {
+//     const signatureResponse = await fetch(`${SIGNATURES_URL}${signatureBytesString}`)
+//     if (!signatureResponse.ok) {
+//       return null
+//     }
+//     const signature = await signatureResponse.text()
+//     const functionName = signature.split('(')[0]
+//     return functionName
+//   } catch (err) {
+//     return null
+//   }
+// }
 
 const getAllowance = async (native, chainId) => {
   try {
@@ -70,29 +69,25 @@ export const getApprovals = async (
   if (!transactions?.result) {
     return null
   }
+
   const addresses: string[] = []
   const approvals = await Promise.all(
     transactions.result.map(async transaction => {
-      const signatureBytesString = transaction.input.substring(2, 10)
-      if (signatureBytesString.length !== 8) {
+      const signatureBytesString = transaction.input.substring(0, 10)
+      if (signatureBytesString !== APPROVE_SHA3) {
         return null
       }
-
-      const functionName = await getFunctionName(signatureBytesString)
 
       const native = await Moralis.Web3API.native.getTransaction({
         chain: chainId,
         transaction_hash: transaction.hash,
       })
-      if (functionName !== APPROVE) {
-        return null
-      }
+
       addresses.push(transaction.to_address)
       const { spenderAddress, allowance } = await getAllowance(native, chainId)
       return {
         transactionHash: transaction.hash,
         contractAddress: transaction.to_address,
-        functionName,
         timestamp: transaction.block_timestamp,
         allowance,
         spenderAddress,
@@ -103,7 +98,10 @@ export const getApprovals = async (
   const tokenMetadatas = await getTokenMetadata(addresses, chainId)
 
   return approvals
-    .filter(transaction => !!transaction && transaction.allowance !== 0)
+    .filter(
+      transaction => !!transaction,
+      //  && transaction.allowance !== 0
+    )
     .map(transaction => {
       return {
         ...transaction,
@@ -112,21 +110,21 @@ export const getApprovals = async (
     }) as ApprovalTransactions[]
 }
 
-export const revoke = async (
-  accountAddress: string | null,
-  contractAddress: string | null,
-  chainId: ChainId,
-) => {
-  const { message } = await Moralis.Plugins.oneInch.approve({
-    chain: chainId,
-    fromAddress: accountAddress,
-    tokenAddress: contractAddress,
-  })
-  notification.info({
-    message: 'Error',
-    description: message,
-  })
-}
+// export const revoke = async (
+//   accountAddress: string | null,
+//   contractAddress: string | null,
+//   chainId: ChainId,
+// ) => {
+//   const { message } = await Moralis.Plugins.oneInch.approve({
+//     chain: chainId,
+//     fromAddress: accountAddress,
+//     tokenAddress: contractAddress,
+//   })
+//   notification.info({
+//     message: 'Error',
+//     description: message,
+//   })
+// }
 
 export const revokeTokens = async (
   contract_address: string,

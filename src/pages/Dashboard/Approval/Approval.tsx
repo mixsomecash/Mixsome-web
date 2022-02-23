@@ -1,11 +1,11 @@
-import { CloseOutlined, CopyOutlined, InfoCircleOutlined, MoreOutlined } from '@ant-design/icons'
+import { CloseOutlined, CopyOutlined } from '@ant-design/icons'
 import { notification } from 'antd'
 import { ErrorMessage, Loader } from 'components'
 import React, { useEffect, useState } from 'react'
 import { useMoralis } from 'react-moralis'
 import { ChainId } from 'types/moralis'
 import { getEllipsisText } from 'utils/formatters'
-import { getApprovals, revoke, revokeTokens } from './ApprovalHelp'
+import { getApprovals, revokeTokens } from './ApprovalHelp'
 import { ApprovalTransactions } from './types'
 
 const copyToClipboard = text => {
@@ -17,7 +17,7 @@ const copyToClipboard = text => {
           message: 'Copied to clipboard',
         })
       })
-      .catch(err => {
+      .catch(() => {
         notification.info({
           message: 'Error',
           description: "Can't copy to clipboard",
@@ -53,16 +53,41 @@ const Approval = () => {
     {
       title: 'Contract',
       render: (transaction: ApprovalTransactions) => (
-        <div
-          onClick={() => copyToClipboard(transaction.contractAddress)}
-          onKeyPress={() => copyToClipboard(transaction.contractAddress)}
-          role="button"
-          tabIndex={0}
-        >
-          {getEllipsisText(transaction.contractAddress)}
-          &nbsp;
-          <CopyOutlined className="text-light align-middle" />
-        </div>
+        <>
+          {chainId === '0x1' && (
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`https://etherscan.io/tx/${transaction.transactionHash}`}
+              className="text-light hover:text-black block px-4 py-2 text-sm"
+              tabIndex={-1}
+            >
+              {getEllipsisText(transaction.contractAddress)}
+            </a>
+          )}
+          {chainId === '0x38' && (
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`https://bscscan.com/tx/${transaction.transactionHash}`}
+              className="text-light hover:text-black block px-4 py-2 text-sm"
+              tabIndex={-1}
+            >
+              {getEllipsisText(transaction.contractAddress)}
+            </a>
+          )}
+          {chainId !== '0x38' && chainId !== '0x1' && (
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`https://bscscan.com/tx/${transaction.transactionHash}`}
+              className="text-light hover:text-black block px-4 py-2 text-sm"
+              tabIndex={-1}
+            >
+              {getEllipsisText(transaction.contractAddress)}
+            </a>
+          )}
+        </>
       ),
     },
     {
@@ -93,56 +118,15 @@ const Approval = () => {
       render: (transaction: ApprovalTransactions) => (
         <>
           <button
-            onClick={() => setShowActionsDropdown(transaction.transactionHash)}
             type="button"
-            className="inline-flex justify-center w-full rounded-md  px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+            className=" text-light hover:text-black border-light border hover:border-black px-3 py-2 text-sm bg-white"
+            onClick={() => {
+              revokeTokens(transaction.contractAddress, transaction.spenderAddress, account)
+            }}
           >
-            <MoreOutlined />
+            <CloseOutlined className="align-middle" />
+            &nbsp;Revoke
           </button>
-          {showActionsDropdown === transaction.transactionHash && (
-            <div
-              className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-              role="menu"
-            >
-              <div className="py-1" role="none">
-                {chainId === '0x1' && (
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`https://etherscan.io/tx/${transaction.transactionHash}`}
-                    className="text-light hover:text-black block px-4 py-2 text-sm"
-                    tabIndex={-1}
-                  >
-                    <InfoCircleOutlined className="align-middle" />
-                    &nbsp;Open In Etherscan
-                  </a>
-                )}
-                {chainId === '0x38' && (
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`https://bscscan.com/tx/${transaction.transactionHash}`}
-                    className="text-light hover:text-black block px-4 py-2 text-sm"
-                    tabIndex={-1}
-                  >
-                    <InfoCircleOutlined className="align-middle" />
-                    &nbsp;Open In BscScan
-                  </a>
-                )}
-
-                <button
-                  type="button"
-                  className=" text-light hover:text-black block px-4 py-2 text-sm"
-                  onClick={() => {
-                    revokeTokens(transaction.contractAddress, transaction.spenderAddress, account)
-                  }}
-                >
-                  <CloseOutlined className="align-middle" />
-                  &nbsp;Revoke
-                </button>
-              </div>
-            </div>
-          )}
         </>
       ),
     },
