@@ -2,7 +2,7 @@ import { Moralis } from 'moralis'
 import { ChainId } from 'types/moralis'
 import tokenAbi from 'utils/ERC20.json'
 import { AbiItem } from 'web3-utils'
-import { ApprovalTransactions, TokenMetadata } from './types'
+import { ApprovalTransactions, MetaMaskError, TokenMetadata } from './types'
 
 const APPROVE_SHA3 = '0x095ea7b3'
 const MAX_APPROVAL_AMOUNT = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -19,6 +19,7 @@ const getTokenMetadata = async (
       chain: chainId,
       addresses,
     })
+    console.log('metaData', metaData)
     return metaData
   } catch (error) {
     return null
@@ -88,7 +89,9 @@ export const getApprovals = async (
   }
 
   const addresses: string[] = []
+  const transactionsToShow: ApprovalTransactions[] = []
   const approvals = await Promise.all(
+    // remove duplicate
     transactions.result.map(async transaction => {
       const signatureBytesString = transaction.input.substring(0, 10)
       if (signatureBytesString !== APPROVE_SHA3) {
@@ -96,29 +99,39 @@ export const getApprovals = async (
       }
 
       const inputData = parseApproveInputData(transaction.input)
-      if (inputData.allowance === MIN_APPROVAL_AMOUNT) {
-        return null
-      }
 
-      addresses.push(transaction.to_address)
-
-      return {
-        transactionHash: transaction.hash,
-        contractAddress: transaction.to_address,
-        timestamp: transaction.block_timestamp,
-        allowance:
-          inputData.allowance === MAX_APPROVAL_AMOUNT
-            ? 'Unlimited'
-            : web3.utils.fromWei(web3.utils.hexToNumberString(`0x${inputData.allowance}`), 'ether'),
-        spenderAddress: `0x${inputData?.spenderAddress}`,
-        metadata: null,
+      if (
+        transactionsToShow.findIndex(
+          t =>
+            t.spenderAddress === `0x${inputData?.spenderAddress}` &&
+            t.contractAddress === transaction.to_address,
+        ) === -1
+      ) {
+        const txn: ApprovalTransactions = {
+          transactionHash: transaction.hash,
+          contractAddress: transaction.to_address,
+          timestamp: transaction.block_timestamp,
+          allowance:
+            inputData.allowance === MAX_APPROVAL_AMOUNT
+              ? 'Unlimited'
+              : web3.utils.fromWei(
+                  web3.utils.hexToNumberString(`0x${inputData.allowance}`),
+                  'ether',
+                ),
+          spenderAddress: `0x${inputData?.spenderAddress}`,
+          metadata: null,
+        }
+        transactionsToShow.push(txn)
+        addresses.push(transaction.to_address)
+        return txn
       }
+      return null
     }),
   )
   const tokenMetadatas = await getTokenMetadata(addresses, chainId)
 
   return approvals
-    .filter(transaction => !!transaction)
+    .filter(transaction => !!transaction && transaction.allowance !== '0')
     .map(transaction => {
       return {
         ...transaction,
@@ -146,16 +159,23 @@ export const getApprovals = async (
 export const revokeTokens = async (
   contract_address: string,
   spender_address: string,
-  account?: string | null,
+  account: string | null,
+  cb: ({ isSuccess, message }) => void,
 ) => {
   try {
-    console.log(contract_address,"spender",spender_address,account)
     const connector = await Moralis.Web3.enableWeb3()
     const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], contract_address)
     await tokenContract.methods.approve(spender_address, '0').send({ from: account })
-
+    cb({
+      isSuccess: true,
+      message: 'The token has been revoked',
+    })
     return true
-  } catch {
+  } catch (err) {
+    cb({
+      isSuccess: false,
+      message: 'Somthing went wrong',
+    })
     return false
   }
 }

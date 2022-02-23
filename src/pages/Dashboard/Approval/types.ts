@@ -12,6 +12,11 @@ export type TokenMetadata = {
   validated?: string
 }
 
+export type MetaMaskError = {
+  code: number
+  message: string
+}
+
 export type ApprovalTransactions = {
   transactionHash: string
   contractAddress: string

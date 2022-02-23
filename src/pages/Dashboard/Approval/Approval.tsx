@@ -1,4 +1,4 @@
-import { CloseOutlined, CopyOutlined } from '@ant-design/icons'
+import { CloseOutlined, CopyOutlined, LoadingOutlined } from '@ant-design/icons'
 import { notification } from 'antd'
 import { ErrorMessage, Loader } from 'components'
 import React, { useEffect, useState } from 'react'
@@ -33,7 +33,42 @@ const copyToClipboard = text => {
 const Approval = () => {
   const { chainId, account } = useMoralis()
   const [isLoading, setIsLoading] = useState(true)
+  const [approvalsChanged, setApprovalsChanged] = useState<number>(0)
   const [approvals, setApprovals] = useState<ApprovalTransactions[]>([])
+  const [revokeLoadings, setRevokeLoadings] = useState<string[]>([])
+  useEffect(() => {
+    ;(async () => {
+      if (!account || !chainId) {
+        setIsLoading(false)
+        return
+      }
+      const result = await getApprovals(account, chainId as ChainId)
+      setIsLoading(false)
+      if (result) {
+        setApprovals(result)
+        setRevokeLoadings([])
+      }
+    })()
+  }, [account, chainId, approvalsChanged])
+
+  const handleRevokeLoading = (contractAddress, spenderAddress, transactionHash) => {
+    setRevokeLoadings([...revokeLoadings, transactionHash])
+    revokeTokens(contractAddress, spenderAddress, account, async ({ isSuccess, message }) => {
+      setRevokeLoadings(revokeLoadings.filter(item => item !== transactionHash))
+      if (isSuccess) {
+        setApprovalsChanged(Math.random())
+        notification.success({
+          message: 'Success',
+          description: message,
+        })
+      } else {
+        notification.error({
+          message: 'Error',
+          description: message,
+        })
+      }
+    })
+  }
 
   const columns = [
     {
@@ -120,34 +155,33 @@ const Approval = () => {
       title: 'Actions',
       render: (transaction: ApprovalTransactions) => (
         <>
-          <button
-            type="button"
-            className=" text-light hover:text-black border-light border hover:border-black px-3 py-2 text-sm bg-white"
-            onClick={() => {
-              revokeTokens(transaction.contractAddress, transaction.spenderAddress, account)
-            }}
-          >
-            <CloseOutlined className="align-middle" />
-            &nbsp;Revoke
-          </button>
+          {!revokeLoadings.includes(transaction.transactionHash) ? (
+            <button
+              type="button"
+              className=" text-light hover:text-black border-light border hover:border-black px-3 py-2 text-sm bg-white"
+              onClick={() => {
+                handleRevokeLoading(
+                  transaction.contractAddress,
+                  transaction.spenderAddress,
+                  transaction.transactionHash,
+                )
+              }}
+            >
+              <CloseOutlined className="align-middle" />
+              &nbsp;Revoke
+            </button>
+          ) : (
+            <button
+              type="button"
+              className=" text-light hover:text-black border-light border hover:border-black px-3 py-2 text-sm bg-white"
+            >
+              <LoadingOutlined />
+            </button>
+          )}
         </>
       ),
     },
   ]
-
-  useEffect(() => {
-    ;(async () => {
-      if (!account || !chainId) {
-        setIsLoading(false)
-        return
-      }
-      const result = await getApprovals(account, chainId as ChainId)
-      setIsLoading(false)
-      if (result) {
-        setApprovals(result)
-      }
-    })()
-  }, [account, chainId])
 
   return (
     <div className="w-full bg-white px-6 py-4 xl:px-12 xl:py-10">
