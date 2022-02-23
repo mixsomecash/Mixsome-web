@@ -5,6 +5,9 @@ import { AbiItem } from 'web3-utils'
 import { ApprovalTransactions, TokenMetadata } from './types'
 
 const APPROVE_SHA3 = '0x095ea7b3'
+const MAX_APPROVAL_AMOUNT = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+const MIN_APPROVAL_AMOUNT = '0000000000000000000000000000000000000000000000000000000000000000'
+
 // const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
 
 const getTokenMetadata = async (
@@ -36,20 +39,35 @@ const getTokenMetadata = async (
 //   }
 // }
 
-const getAllowance = async (native, chainId) => {
-  try {
-    const { allowance } = await Moralis.Web3API.token.getTokenAllowance({
-      chain: chainId,
-      owner_address: `0x${native.logs[0]?.topic1?.slice(-40)}`,
-      spender_address: `0x${native.logs[0]?.topic2?.slice(-40)}`,
-      address: native.logs[0]?.address,
-    })
-    return { allowance, spenderAddress: `0x${native.logs[0]?.topic2?.slice(-40)}` }
-  } catch (err) {
+// const getAllowance = async (native, chainId) => {
+//   try {
+//     const { allowance } = await Moralis.Web3API.token.getTokenAllowance({
+//       chain: chainId,
+//       owner_address: `0x${native.logs[0]?.topic1?.slice(-40)}`,
+//       spender_address: `0x${native.logs[0]?.topic2?.slice(-40)}`,
+//       address: native.logs[0]?.address,
+//     })
+//     return { allowance, spenderAddress: `0x${native.logs[0]?.topic2?.slice(-40)}` }
+//   } catch (err) {
+//     return {
+//       allowance: 0,
+//       spenderAddress: 'N/A',
+//     }
+//   }
+// }
+
+const parseApproveInputData = (input_data: string) => {
+  if (input_data.length !== 138) {
     return {
-      allowance: 0,
       spenderAddress: 'N/A',
+      allowance: MIN_APPROVAL_AMOUNT,
     }
+  }
+  // check every 256 bit after first 32 bit to see function inputs data
+  const amount = input_data.slice(10).slice(-64)
+  return {
+    spenderAddress: input_data.slice(10).slice(0, 64).slice(-40),
+    allowance: amount,
   }
 }
 
@@ -57,6 +75,7 @@ export const getApprovals = async (
   accountAddress: string,
   chainId: ChainId,
 ): Promise<ApprovalTransactions[] | null> => {
+  const web3 = await Moralis.Web3.enableWeb3()
   const transactions = await Moralis.Web3API.account
     .getTransactions({
       chain: chainId,
@@ -76,19 +95,22 @@ export const getApprovals = async (
         return null
       }
 
-      const native = await Moralis.Web3API.native.getTransaction({
-        chain: chainId,
-        transaction_hash: transaction.hash,
-      })
+      const inputData = parseApproveInputData(transaction.input)
+      if (inputData.allowance === MIN_APPROVAL_AMOUNT) {
+        return null
+      }
 
       addresses.push(transaction.to_address)
-      const { spenderAddress, allowance } = await getAllowance(native, chainId)
+
       return {
         transactionHash: transaction.hash,
         contractAddress: transaction.to_address,
         timestamp: transaction.block_timestamp,
-        allowance,
-        spenderAddress,
+        allowance:
+          inputData.allowance === MAX_APPROVAL_AMOUNT
+            ? 'Unlimited'
+            : web3.utils.fromWei(web3.utils.hexToNumberString(`0x${inputData.allowance}`), 'ether'),
+        spenderAddress: inputData?.spenderAddress,
         metadata: null,
       }
     }),
@@ -96,10 +118,7 @@ export const getApprovals = async (
   const tokenMetadatas = await getTokenMetadata(addresses, chainId)
 
   return approvals
-    .filter(
-      transaction => !!transaction,
-      //  && transaction.allowance !== 0
-    )
+    .filter(transaction => !!transaction)
     .map(transaction => {
       return {
         ...transaction,

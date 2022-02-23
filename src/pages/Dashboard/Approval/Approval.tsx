@@ -91,7 +91,9 @@ const Approval = () => {
     },
     {
       title: 'Date',
-      render: (transaction: ApprovalTransactions) => new Date(transaction.timestamp).toUTCString(),
+      render: (transaction: ApprovalTransactions) => (
+        <span className="opacity-70">{new Date(transaction.timestamp).toUTCString()}</span>
+      ),
     },
     {
       title: 'Spender',
@@ -154,7 +156,7 @@ const Approval = () => {
       </div>
       {isLoading && <Loader />}
       {!isLoading && approvals && approvals.length > 0 && (
-        <div className="scrollable-table-wrapper" style={{ overflow: 'visible' }}>
+        <div className="scrollable-table-wrapper">
           <table className="table-auto w-full xl:mt-4">
             <thead className="border-b border-black border-opacity-20 pb-10">
               <tr>
