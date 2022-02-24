@@ -37,6 +37,7 @@ const Approval = () => {
   const [approvals, setApprovals] = useState<ApprovalTransactions[]>([])
   const [revokeLoadings, setRevokeLoadings] = useState<string[]>([])
   useEffect(() => {
+    setIsLoading(true)
     ;(async () => {
       if (!account || !chainId) {
         setIsLoading(false)

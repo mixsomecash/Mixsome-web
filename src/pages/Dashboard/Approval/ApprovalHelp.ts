@@ -1,8 +1,9 @@
 import { Moralis } from 'moralis'
 import { ChainId } from 'types/moralis'
 import tokenAbi from 'utils/ERC20.json'
+import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
-import { ApprovalTransactions, MetaMaskError, TokenMetadata } from './types'
+import { ApprovalTransactions, TokenMetadata } from './types'
 
 const APPROVE_SHA3 = '0x095ea7b3'
 const MAX_APPROVAL_AMOUNT = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -10,17 +11,22 @@ const MIN_APPROVAL_AMOUNT = '000000000000000000000000000000000000000000000000000
 
 // const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
 
+const calculateAllowance = (web3: Moralis.Web3, allowance: string, decimals: string) => {
+  return allowance === MAX_APPROVAL_AMOUNT
+    ? 'Unlimited'
+    : Moralis.Units.FromWei(web3.utils.hexToNumberString(`0x${allowance}`), parseInt(decimals, 10))
+}
+
 const getTokenMetadata = async (
   addresses: string[],
   chainId: ChainId,
 ): Promise<TokenMetadata[] | null> => {
   try {
-    const metaData = await Moralis.Web3API.token.getTokenMetadata({
+    const metaDatas = await Moralis.Web3API.token.getTokenMetadata({
       chain: chainId,
       addresses,
     })
-    console.log('metaData', metaData)
-    return metaData
+    return metaDatas
   } catch (error) {
     return null
   }
@@ -76,7 +82,6 @@ export const getApprovals = async (
   accountAddress: string,
   chainId: ChainId,
 ): Promise<ApprovalTransactions[] | null> => {
-  const web3 = await Moralis.Web3.enableWeb3()
   const transactions = await Moralis.Web3API.account
     .getTransactions({
       chain: chainId,
@@ -91,7 +96,6 @@ export const getApprovals = async (
   const addresses: string[] = []
   const transactionsToShow: ApprovalTransactions[] = []
   const approvals = await Promise.all(
-    // remove duplicate
     transactions.result.map(async transaction => {
       const signatureBytesString = transaction.input.substring(0, 10)
       if (signatureBytesString !== APPROVE_SHA3) {
@@ -111,33 +115,54 @@ export const getApprovals = async (
           transactionHash: transaction.hash,
           contractAddress: transaction.to_address,
           timestamp: transaction.block_timestamp,
-          allowance:
-            inputData.allowance === MAX_APPROVAL_AMOUNT
-              ? 'Unlimited'
-              : web3.utils.fromWei(
-                  web3.utils.hexToNumberString(`0x${inputData.allowance}`),
-                  'ether',
-                ),
+          allowance: inputData.allowance,
           spenderAddress: `0x${inputData?.spenderAddress}`,
           metadata: null,
         }
         transactionsToShow.push(txn)
-        addresses.push(transaction.to_address)
+        if (inputData.allowance !== MIN_APPROVAL_AMOUNT) addresses.push(transaction.to_address)
         return txn
       }
       return null
     }),
   )
-  const tokenMetadatas = await getTokenMetadata(addresses, chainId)
+  const web3 = await Moralis.Web3.enableWeb3()
+  const metadatas = await getTokenMetadata(addresses, chainId)
+  //  metadatas => {
+  //   approvals.map(transaction => {
+  //     const myMetaData = metadatas?.find(token => token.address === transaction?.contractAddress)
+  //     if (!myMetaData) {
+  //       return transaction
+  //     }
+  //     return {
+  //       ...transaction,
+  //       allowance: calculateAllowance(
+  //         web3,
+  //         transaction?.allowance || '0',
+  //         myMetaData?.decimals || '18',
+  //       ),
+  //       metadata: myMetaData,
+  //     }
+  //   })
+  // })
 
   return approvals
-    .filter(transaction => !!transaction && transaction.allowance !== '0')
     .map(transaction => {
+      const myMetadata = metadatas?.find(token => token.address === transaction?.contractAddress)
+      if (!myMetadata) {
+        return null
+      }
       return {
         ...transaction,
-        metadata: tokenMetadatas?.find(token => token.address === transaction?.contractAddress),
+        allowance: calculateAllowance(
+          web3,
+          transaction?.allowance || '0',
+          myMetadata?.decimals || '18',
+        ),
+        metadata: myMetadata,
       }
-    }) as ApprovalTransactions[]
+    })
+    .filter(transaction => !!transaction && transaction.allowance !== '0') as ApprovalTransactions[]
 }
 
 // export const revoke = async (
