@@ -4,6 +4,7 @@ export enum DashboardTab {
   History = 3,
   Defi = 4,
   Wallet = 5,
+  Approval = 6,
 }
 
 export enum DashboardNetwork {

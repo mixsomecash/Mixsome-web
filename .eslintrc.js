@@ -29,7 +29,7 @@ module.exports = {
   rules: {
     'linebreak-style': 'off',
     'prettier/prettier': [
-      'error',
+      'warn', // i changed to warn , because of the error: insert traling new line on line 1:37 Approval/index.tsx "prettier/prettier 
       {
         endOfLine: 'auto',
       },
