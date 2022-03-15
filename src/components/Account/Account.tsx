@@ -29,6 +29,7 @@ const styles = {
   },
   text: {
     color: '#21BF96',
+    fontSize: '25px',
   },
   connector: {
     alignItems: 'center',
@@ -59,7 +60,7 @@ function Account() {
     return (
       <>
         <div onClick={() => setIsAuthModalVisible(true)}>
-          <p style={styles.text}>Authenticate</p>
+          <p style={styles.text}>Connect To Wallet</p>
         </div>
         <Modal
           visible={isAuthModalVisible}
@@ -82,7 +83,7 @@ function Account() {
               fontSize: '20px',
             }}
           >
-            allet
+            Wallet
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
             {connectors.map(({ title, icon, connectorId }, key) => (
