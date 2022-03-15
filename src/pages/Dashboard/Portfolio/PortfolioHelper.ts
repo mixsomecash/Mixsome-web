@@ -82,7 +82,7 @@ export const getTokenBalances = async (
       const tokenPrice = await Moralis.Web3API.token
         .getTokenPrice({
           address: token.token_address,
-          chain: chainId as '0x1' | '0x38',
+          chain: chainId as '0x1' | '0x38' | '0x89' |'0xa86a'
         })
         .catch(() => null)
 
