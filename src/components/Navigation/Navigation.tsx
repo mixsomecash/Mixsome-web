@@ -6,6 +6,7 @@ import { config } from 'config'
 import { getEllipsisText } from 'utils/formatters'
 import NavigationInfo from './NavigationInfo'
 import ChainsDropdown from './ChainsDropdown'
+import Account from 'components/Account'
 
 const Navigation = () => {
   const { Moralis, account, isAuthenticated, isInitialized, authenticate, logout } = useMoralis()
@@ -16,9 +17,8 @@ const Navigation = () => {
   const handleBurgerIconClick = () => {
     setIsMobileMenuVisible(state => !state)
   }
-
-  const handleConnectClick = async () => {
-    await authenticate()
+  const handleConnectClick =  () => {
+    return <Account/>
   }
 
   const handleDisconnectClick = () => {
