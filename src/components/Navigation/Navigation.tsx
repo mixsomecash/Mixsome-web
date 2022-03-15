@@ -6,10 +6,11 @@ import { config } from 'config'
 import { getEllipsisText } from 'utils/formatters'
 import NavigationInfo from './NavigationInfo'
 import ChainsDropdown from './ChainsDropdown'
-import Account from 'components/Account'
+import Account from '../Account/Account'
 
 const Navigation = () => {
-  const { Moralis, account, isAuthenticated, isInitialized, authenticate, logout } = useMoralis()
+  const { Moralis, account, isAuthenticated, isInitialized, authenticate, logout, enableWeb3 } =
+    useMoralis()
 
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
   const [memberCount, setMemberCount] = useState(0)
@@ -17,8 +18,10 @@ const Navigation = () => {
   const handleBurgerIconClick = () => {
     setIsMobileMenuVisible(state => !state)
   }
-  const handleConnectClick =  () => {
-    return <Account/>
+
+  const handleConnectClick = async () => {
+    enableWeb3()
+    await authenticate()
   }
 
   const handleDisconnectClick = () => {
@@ -37,7 +40,7 @@ const Navigation = () => {
   }
 
   const renderConnectButton = () => {
-    return <Button text="Connect to wallet" onClick={handleConnectClick} />
+    return <Account/>
   }
 
   const renderWalletInfo = () => {
