@@ -33,6 +33,18 @@ const ChainsDropdown = () => {
       label: 'Binance',
       onClick: handleOptionClick,
     },
+    {
+      key: '0x89',
+      icon: renderCurrencyIcon(Currency.Polygon),
+      label: 'Polygon',
+      onClick: handleOptionClick,
+    },
+    {
+      key: '0x1',
+      icon: renderCurrencyIcon(Currency.Avalanche),
+      label: 'Avalanche',
+      onClick: handleOptionClick,
+    },
   ]
 
   return <Dropdown options={options} selectedOptionKey={chainId} />
