@@ -1,5 +1,8 @@
 export { default as Navigation } from './Navigation'
 export { default as Sidebar } from './Sidebar'
+export { default as Chains } from './Chains'
+export { default as Account } from './Account'
+export { default as Address } from './Address'
 export { default as Button } from './Button'
 export { default as Badge } from './Badge'
 export { default as Progress } from './Progress'
