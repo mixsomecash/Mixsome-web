@@ -5,11 +5,11 @@
 /* eslint-disable no-console */
 /* eslint-disable react/react-in-jsx-scope */
 import { useMoralis } from 'react-moralis'
-import { getEllipsisTxt } from 'helpers/formatters'
+import { getEllipsisText } from '../../utils/formatters'
 import { Button, Card, Modal } from 'antd'
 import { useState } from 'react'
 import { SelectOutlined } from '@ant-design/icons'
-import { getExplorer } from 'helpers/networks'
+import { getExplorer } from '../../utils/networks'
 import Text from 'antd/lib/typography/Text'
 import Address from '../Address/Address'
 import Blockie from './Blockie'
@@ -128,7 +128,7 @@ function Account() {
         Hi
       </button> */}
       <div style={styles.account} onClick={() => setIsModalVisible(true)}>
-        <p style={{ marginRight: '5px', ...styles.text }}>{getEllipsisTxt(account, 6)}</p>
+        <p style={{ marginRight: '5px', ...styles.text }}>{getEllipsisText(account, 6)}</p>
         <Blockie currentWallet scale={3} />
       </div>
       <Modal
