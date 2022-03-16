@@ -1,47 +1,39 @@
 import React from 'react'
-import { useMoralis } from 'react-moralis'
-import { getCurrencyIconFileName } from 'utils/currencyIcon'
-import { Currency } from 'constants/currency'
+import { useMoralis  } from 'react-moralis'
 import { useChain } from 'hooks'
 import { IconOption } from 'components/Dropdown/types'
 import Dropdown from '../../Dropdown'
-import CurrencyIcon from '../../CurrencyIcon'
+import { AvaxLogo, PolygonLogo, BSCLogo, ETHLogo } from './Logos'
 
 const ChainsDropdown = () => {
   const { chainId } = useMoralis()
   const { switchNetwork } = useChain()
 
-  const renderCurrencyIcon = (currency: Currency) => {
-    const iconUrl = `/images/currencies/${getCurrencyIconFileName(currency)}`
-    return <CurrencyIcon src={iconUrl} />
-  }
-
   const handleOptionClick = async (option: IconOption) => {
     await switchNetwork(option.key)
   }
-
   const options: IconOption[] = [
     {
       key: '0x1',
-      icon: renderCurrencyIcon(Currency.Ether),
+      icon: <ETHLogo />,
       label: 'Ethereum',
       onClick: handleOptionClick,
     },
     {
       key: '0x38',
-      icon: renderCurrencyIcon(Currency.Binance),
+      icon: <BSCLogo />,
       label: 'Binance',
       onClick: handleOptionClick,
     },
     {
       key: '0x89',
-      icon: renderCurrencyIcon(Currency.Polygon),
+      icon: <PolygonLogo />,
       label: 'Polygon',
       onClick: handleOptionClick,
     },
     {
       key: '0x1',
-      icon: renderCurrencyIcon(Currency.Avalanche),
+      icon: <AvaxLogo />,
       label: 'Avalanche',
       onClick: handleOptionClick,
     },
