@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card as AntdCard, Image, Tooltip } from 'antd'
+import axios from 'axios'
 import { FileSearchOutlined, SendOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 
 import { getExplorer } from '../../../utils/networks'
@@ -16,6 +17,35 @@ interface CardProps {
 
 export const Card: React.FC<CardProps> = (props: CardProps) => {
   const { chainId, nft, setVisibility, openNotification } = props
+
+  useEffect(() => {
+    console.log(`${nft.token_address} : ${nft.token_id}`)
+    axios
+      .get(`https://api.opensea.io/api/v1/asset/${nft.token_address}/${nft.token_id}/`)
+      .then(function (response) {
+        axios
+          .get(`https://api.opensea.io/api/v1/collection/${response.data.collection.slug}/stats`)
+          .then(function (response2) {
+            console.log(
+              `average_price - ${response2.data.stats.average_price} \nfloor_price - ${response2.data.stats.floor_price}`,
+            )
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error)
+          })
+          .then(function () {
+            // always executed
+          })
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error)
+      })
+      .then(function () {
+        // always executed
+      })
+  }, [nft])
 
   const viewOnBlockExplorer = (_chainId, token_address) => {
     if (_chainId) window.open(`${getExplorer(_chainId)}address/${token_address}`, '_blank')
