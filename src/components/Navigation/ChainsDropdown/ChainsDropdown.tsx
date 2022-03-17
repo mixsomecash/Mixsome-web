@@ -32,7 +32,7 @@ const ChainsDropdown = () => {
       onClick: handleOptionClick,
     },
     {
-      key: '0x1',
+      key: '0xa86a',
       icon: <AvaxLogo />,
       label: 'Avalanche',
       onClick: handleOptionClick,
