@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Card as AntdCard, Image, Tooltip } from 'antd'
+import { Card as AntdCard, Image, Tooltip, Layout } from 'antd'
 import axios from 'axios'
 import { FileSearchOutlined, SendOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 
@@ -84,7 +84,20 @@ export const Card: React.FC<CardProps> = (props: CardProps) => {
       }
       key={nft.token_id}
     >
-      <Meta title={nft.name} description={nft.token_address} />
+      <Meta title={nft.name} description={nft.token_address}></Meta>
+      <div
+        className="pt-5"
+        style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-around' }}
+      >
+        <div className=" text-center">
+          <h1 className=" font-bold text-32 xl:text-32 xl:leading-26">1 ETH</h1>
+          <p className="opacity-40">Average Price</p>
+        </div>
+        <div className=" px-1 text-center">
+          <h1 className=" font-bold text-32 xl:text-32 xl:leading-26">10</h1>
+          <p className="opacity-40">Floor Price</p>
+        </div>
+      </div>
     </AntdCard>
   )
 }
