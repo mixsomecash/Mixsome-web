@@ -25,6 +25,8 @@ export const Cards: React.FC<CardsProps> = (props: CardsProps) => {
     return nfts.filter(item => item?.name?.toLowerCase().includes(filter.toLowerCase()))
   }, [filter, nfts])
 
+  console.log(filteredNFTs)
+
   const { verifyMetadata } = useVerifyMetadata()
 
   return (

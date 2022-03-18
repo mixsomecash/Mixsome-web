@@ -17,9 +17,7 @@ interface CardProps {
 
 export const Card: React.FC<CardProps> = (props: CardProps) => {
   const { chainId, nft, setVisibility, openNotification } = props
-
-  const [average, setAverage] = useState('')
-
+  const [average, setAverage] = useState('N/A')
   const [floor, setFloor] = useState('N/A')
 
   useEffect(() => {
@@ -30,9 +28,21 @@ export const Card: React.FC<CardProps> = (props: CardProps) => {
         axios
           .get(`https://api.opensea.io/api/v1/collection/${response.data.collection.slug}/stats`)
           .then(function (response2) {
-            setAverage(`${response2.data.stats.average_price.toString()} ETH`)
+            const averagePrice = response2.data.stats.average_price
+            setAverage(
+              `${
+                averagePrice % 1 === 0
+                  ? averagePrice.toString()
+                  : averagePrice.toString().slice(0, 3)
+              } ETH`,
+            )
             if (response2.data.stats.floor_price !== null) {
-              setFloor(`${response2.data.stats.floor_price.toString()} ETH`)
+              const floorPrice = response2.data.stats.floor_price
+              setFloor(
+                `${
+                  averagePrice % 1 === 0 ? floorPrice.toString() : floorPrice.toString().slice(0, 3)
+                } ETH`,
+              )
             }
             console.log(
               `average_price - ${response2.data.stats.average_price} \nfloor_price - ${response2.data.stats.floor_price}`,
