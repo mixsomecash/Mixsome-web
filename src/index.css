@@ -1,0 +1,203 @@
+@import '~antd/dist/antd.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-sans text-black;
+}
+
+.silver-border {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.border-black-opacity-38 {
+  border-color: rgba(0, 0, 0, 0.38);
+}
+
+.content {
+  @apply w-auto m-10 p-10 bg-silver font-sans;
+}
+
+.button--primary {
+  @apply bg-green font-bold px-8 outline-none;
+}
+
+.button--invert {
+  @apply bg-black text-white font-bold px-8 outline-none;
+}
+
+
+.flow__container {
+  min-width: 546px;
+}
+
+@media (max-width: 640px) {
+  .flow__container {
+    min-width: auto;
+  }
+}
+
+.flow-icons__container {
+  position: relative;
+}
+
+.flow-icons__container img {
+  transition: ease-in-out 0.3s;
+  margin-left: -10px;
+}
+
+.flow__container:hover {
+  @apply bg-green;
+}
+
+.flow__container:hover .flow-icons__container img {
+  margin-left: 5px;
+}
+
+.flow__select-pointer {
+  @apply pl-4;
+
+  transition: ease-in-out 0.3s;
+}
+
+.flow__container:hover .flow__select-pointer {
+  @apply pl-8;
+}
+
+.burger-button div {
+  width: 25px;
+  height: 2px;
+  background-color: black;
+  margin: 5px 0;
+}
+
+.link-with-arrow__container {
+  position: relative;
+}
+
+.link-with-arrow__icon {
+  transition: ease-in-out 0.3s;
+}
+
+.link-with-arrow__icon--left {
+  @apply mt-1.5;
+
+  position: absolute;
+}
+
+.link-with-arrow__icon--right {
+  @apply pl-4;
+}
+
+.link-with-arrow__container:hover .link-with-arrow__icon--left  {
+  margin-left: -10px;
+}
+
+.link-with-arrow__container:hover .link-with-arrow__icon--right  {
+  margin-left: 10px;
+}
+
+.line-background {
+  background-repeat: repeat-x;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='1' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%238E8E8E' d='M0 .5h5'/%3E%3C/svg%3E%0A");
+  background-position: center;
+}
+
+.loader {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.loader div {
+  display: inline-block;
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  background: #01F06F;
+  animation: loader 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+
+.loader div:nth-child(1) {
+  left: 8px;
+  animation-delay: -0.24s;
+}
+
+.loader div:nth-child(2) {
+  left: 32px;
+  animation-delay: -0.12s;
+}
+
+.loader div:nth-child(3) {
+  left: 56px;
+  animation-delay: 0;
+}
+
+@keyframes loader{
+  0% {
+    top: 8px;
+    height: 64px;
+  }
+  50%, 100% {
+    top: 24px;
+    height: 32px;
+  }
+}
+
+
+td {
+  @apply border-b border-black border-opacity-20 py-5;
+}
+
+thead td {
+  @apply text-18;
+}
+
+tbody td {
+  @apply text-14 lg:text-18 font-sans;
+}
+
+.scrollable-table-wrapper {
+  position: relative;
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.scrollable-table-wrapper table .sticky-col {
+  position: -webkit-sticky;
+  position: sticky;
+  background-color: #fff;
+
+  z-index: 1;
+  width: auto;
+  left: 0px;
+}
+
+/* Dex nav title is bold on the wire frame.. */
+.dex-nav {
+  font-weight: 900;
+}
+
+/* Dev page styles.. */
+.dex-card {
+  width: 430px;
+  box-shadow: 0 0.5rem 1.2rem rgb(189 197 209 / 20%);
+  border: 1px solid #e7eaf3;
+  border-radius: 1rem;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.dropdown {
+  min-width: 200px;
+}
+
+.dropdown__singleValue {
+  grid-area: 1/1/2/3;
+}
+
+.chart__container {
+  height: 350px
+}
