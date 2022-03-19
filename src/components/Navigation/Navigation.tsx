@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import { useMoralis } from 'react-moralis'
-import { Button } from 'components'
 import { config } from 'config'
-import { getEllipsisText } from 'utils/formatters'
+import Account from 'components/Account/Account'
 import NavigationInfo from './NavigationInfo'
 import ChainsDropdown from './ChainsDropdown'
 
 const Navigation = () => {
-  const { Moralis, account, isAuthenticated, isInitialized, authenticate, logout, enableWeb3 } =
-    useMoralis()
-
+  const { Moralis, account, isInitialized } = useMoralis()
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
   const [memberCount, setMemberCount] = useState(0)
 
@@ -18,13 +14,12 @@ const Navigation = () => {
     setIsMobileMenuVisible(state => !state)
   }
 
-  const handleConnectClick = async () => {
-    enableWeb3()
-    await authenticate()
-  }
-
-  const handleDisconnectClick = () => {
-    logout()
+  const renderWallet = () => {
+    return (
+      <div className="hidden xl:block mx-3">
+        <Account />
+      </div>
+    )
   }
 
   const renderLogo = () => {
@@ -34,26 +29,6 @@ const Navigation = () => {
           m1XSoM3
         </a>
         {!config.isProduction && <p className="opacity-30 text-12">Runs on Ethereum Mainnet</p>}
-      </div>
-    )
-  }
-
-  const renderConnectButton = () => {
-    return <Button text="Connect to wallet" onClick={handleConnectClick} />
-  }
-
-  const renderWalletInfo = () => {
-    if (!account || !isAuthenticated) return null
-    return (
-      <div className="xl:justify-end flex min-w-max items-center">
-        <Jazzicon diameter={64} seed={jsNumberForAddress(account)} />
-        <span className="pl-4 font-bold text-base">{getEllipsisText(account)}</span>
-        <div className="ml-5 hidden lg:block">
-          <Button text="Disconnect" onClick={handleDisconnectClick} />
-        </div>
-        <div className="mx-5 lg:hidden">
-          <Button invert text="Disconnect" onClick={handleDisconnectClick} />
-        </div>
       </div>
     )
   }
@@ -74,14 +49,6 @@ const Navigation = () => {
         <NavigationInfo title="Active Members" body={memberCount} />
         <NavigationInfo title="Total Value Locked" body={0} />
         <NavigationInfo title="Total Yield Earned" body={0} />
-      </div>
-    )
-  }
-
-  const renderUserInfo = () => {
-    return (
-      <div className="hidden xl:block">
-        {isAuthenticated && account ? renderWalletInfo() : renderConnectButton()}
       </div>
     )
   }
@@ -126,13 +93,7 @@ const Navigation = () => {
           </div>
 
           <div className="mx-5 pt-20">
-            {account ? (
-              <div className="flex justify-center items-center">
-                <div className="flex-1">{renderWalletInfo()}</div>
-              </div>
-            ) : (
-              <Button text="Connect to wallet" invert fullWidth onClick={handleConnectClick} />
-            )}
+            {account ? <div className="flex justify-center items-center"> </div> : <Account />}
           </div>
 
           <div className="mx-5 pt-10">
@@ -154,7 +115,7 @@ const Navigation = () => {
           {renderLogo()}
           {renderStats()}
           {renderChainsDropdown()}
-          {renderUserInfo()}
+          {renderWallet()}
           {renderBurger()}
         </nav>
       </div>
