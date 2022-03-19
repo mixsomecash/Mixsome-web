@@ -5,12 +5,12 @@
 /* eslint-disable no-console */
 /* eslint-disable react/react-in-jsx-scope */
 import { useMoralis } from 'react-moralis'
-import { getEllipsisText } from '../../utils/formatters'
 import { Button, Card, Modal } from 'antd'
 import { useState } from 'react'
 import { SelectOutlined } from '@ant-design/icons'
-import { getExplorer } from '../../utils/networks'
 import Text from 'antd/lib/typography/Text'
+import { getEllipsisText } from '../../utils/formatters'
+import { getExplorer } from '../../utils/networks'
 import Address from '../Address/Address'
 import Blockie from './Blockie'
 import { connectors } from './config'
@@ -68,7 +68,7 @@ function Account() {
           onCancel={() => setIsAuthModalVisible(false)}
           bodyStyle={{
             padding: '15px',
-            fontSize: '25px',
+            fontSize: '17px',
             fontWeight: '500',
           }}
           style={{ fontSize: '16px', fontWeight: '500' }}
