@@ -68,7 +68,7 @@ function Account() {
           onCancel={() => setIsAuthModalVisible(false)}
           bodyStyle={{
             padding: '15px',
-            fontSize: '17px',
+            fontSize: '25px',
             fontWeight: '500',
           }}
           style={{ fontSize: '16px', fontWeight: '500' }}
