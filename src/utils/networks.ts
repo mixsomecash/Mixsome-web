@@ -77,4 +77,4 @@ export const networkConfigs = {
   },
 }
 
-export const getExplorer = (chain: string) => networkConfigs[chain]?.blockExplorerUrl
+export const getExplorer = chain => networkConfigs[chain]?.blockExplorerUrl
