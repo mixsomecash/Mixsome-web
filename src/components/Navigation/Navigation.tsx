@@ -8,7 +8,8 @@ import NavigationInfo from './NavigationInfo'
 import ChainsDropdown from './ChainsDropdown'
 
 const Navigation = () => {
-  const { Moralis, account, isAuthenticated, isInitialized, authenticate, logout } = useMoralis()
+  const { Moralis, account, isAuthenticated, isInitialized, authenticate, logout, enableWeb3 } =
+    useMoralis()
 
   const [isMobileMenuVisible, setIsMobileMenuVisible] = useState(false)
   const [memberCount, setMemberCount] = useState(0)
@@ -18,6 +19,7 @@ const Navigation = () => {
   }
 
   const handleConnectClick = async () => {
+    enableWeb3()
     await authenticate()
   }
 

@@ -1,5 +1,6 @@
-import React from 'react'
-import { Card as AntdCard, Image, Tooltip } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Card as AntdCard, Image, Tooltip, Layout } from 'antd'
+import axios from 'axios'
 import { FileSearchOutlined, SendOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 
 import { getExplorer } from '../../../utils/networks'
@@ -16,6 +17,53 @@ interface CardProps {
 
 export const Card: React.FC<CardProps> = (props: CardProps) => {
   const { chainId, nft, setVisibility, openNotification } = props
+  const [average, setAverage] = useState('N/A')
+  const [floor, setFloor] = useState('N/A')
+
+  useEffect(() => {
+    console.log(`${nft.token_address} : ${nft.token_id}`)
+    axios
+      .get(`https://api.opensea.io/api/v1/asset/${nft.token_address}/${nft.token_id}/`)
+      .then(function (response) {
+        axios
+          .get(`https://api.opensea.io/api/v1/collection/${response.data.collection.slug}/stats`)
+          .then(function (response2) {
+            const averagePrice = response2.data.stats.average_price
+            setAverage(
+              `${
+                averagePrice % 1 === 0
+                  ? averagePrice.toString()
+                  : averagePrice.toString().slice(0, 4)
+              } ETH`,
+            )
+            if (response2.data.stats.floor_price !== null) {
+              const floorPrice = response2.data.stats.floor_price
+              setFloor(
+                `${
+                  averagePrice % 1 === 0 ? floorPrice.toString() : floorPrice.toString().slice(0, 4)
+                } ETH`,
+              )
+            }
+            console.log(
+              `average_price - ${response2.data.stats.average_price} \nfloor_price - ${response2.data.stats.floor_price}`,
+            )
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error)
+          })
+          .then(function () {
+            // always executed
+          })
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error)
+      })
+      .then(function () {
+        // always executed
+      })
+  }, [nft])
 
   const viewOnBlockExplorer = (_chainId, token_address) => {
     if (_chainId) window.open(`${getExplorer(_chainId)}address/${token_address}`, '_blank')
@@ -54,7 +102,22 @@ export const Card: React.FC<CardProps> = (props: CardProps) => {
       }
       key={nft.token_id}
     >
-      <Meta title={nft.name} description={nft.token_address} />
+      <Meta title={nft.name} description={nft.token_address}></Meta>
+      <div
+        className="pt-5"
+        style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-around' }}
+      >
+        <div className=" text-center">
+          <h1 className=" font-bold text-24 xl:text-24 xl:leading-26">{average}</h1>
+          <p className="opacity-40">Average Price</p>
+        </div>
+        <br />
+
+        <div className=" px-1 text-center">
+          <h1 className=" font-bold text-24 xl:text-24 xl:leading-26">{floor}</h1>
+          <p className="opacity-40">Floor Price</p>
+        </div>
+      </div>
     </AntdCard>
   )
 }

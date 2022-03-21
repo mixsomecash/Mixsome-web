@@ -15,6 +15,6 @@ export type PoolContractData = {
   maturityDays: number
   launchTime: number
   closingTime: number
-  accountStaked: number
-  accountStakedTime: number
+  accountStaked: number | null
+  accountStakedTime: number | null
 }
