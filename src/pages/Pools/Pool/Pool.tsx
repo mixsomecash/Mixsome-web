@@ -37,7 +37,7 @@ const Pool = ({ pool }: Props) => {
       }
       setIsLoading(false)
     })()
-  }, [Moralis.Web3, account, pool])
+  }, [Moralis.Web3, pool, account])
 
   const handleLockClick = () => {
     if (!account || !poolContractData) {
@@ -106,10 +106,13 @@ const Pool = ({ pool }: Props) => {
           },
           {
             label: 'You have staked',
-            value: `${Moralis.Units.FromWei(
-              poolContractData.accountStaked,
-              parseFloat(poolContractData.token.decimals),
-            )} ${[poolContractData.token.symbol]}`,
+            value:
+              poolContractData.accountStaked !== null
+                ? `${Moralis.Units.FromWei(
+                    poolContractData.accountStaked,
+                    parseFloat(poolContractData.token.decimals),
+                  )} ${[poolContractData.token.symbol]}`
+                : 'Connect to wallet',
           },
         ]
       : null

@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Modal, InvestInput, Loader } from 'components'
 import { useMoralis } from 'react-moralis'
 import { PoolContractData, PoolInfo } from './types'
-import { approveTokens, stakeTokens } from './PoolHelper'
+import { approveTokens, stakeTokens, checkAllowance } from './PoolHelper'
 
 type Props = {
   isVisible: boolean
@@ -12,10 +12,22 @@ type Props = {
 }
 
 const StakeModal = ({ isVisible, pool, poolContractData, onClose }: Props) => {
-  const { account } = useMoralis()
+  const { account, chainId } = useMoralis()
   const [isApproved, setIsApproved] = useState(false)
   const [investValue, setInvestValue] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    ;(async () => {
+      if (!poolContractData || !account || chainId !== pool.chainId) {
+        return
+      }
+      setIsLoading(true)
+      const isAllowance = await checkAllowance(pool, poolContractData.token, account)
+      setIsApproved(isAllowance)
+      setIsLoading(false)
+    })()
+  }, [account, chainId, pool, poolContractData])
 
   const handleApproveButtonClick = async () => {
     if (!account || !poolContractData) {
@@ -40,7 +52,7 @@ const StakeModal = ({ isVisible, pool, poolContractData, onClose }: Props) => {
       return
     }
     setIsLoading(true)
-    const result = await stakeTokens(pool, investValue, account)
+    const result = await stakeTokens(pool, poolContractData, investValue, account)
     setIsLoading(false)
     if (result) {
       onClose()
