@@ -38,6 +38,8 @@ export const networkConfigs = {
     currencySymbol: 'AVAX',
     rpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
     blockExplorerUrl: 'https://cchain.explorer.avax.network/',
+    coinGeckoId: 'avalanche-2',
+    decimals: 18,
   },
   '0x38': {
     chainId: 56,
@@ -66,6 +68,8 @@ export const networkConfigs = {
     rpcUrl: 'https://rpc-mainnet.maticvigil.com/',
     blockExplorerUrl: 'https://explorer-mainnet.maticvigil.com/',
     wrapped: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
+    coinGeckoId: 'matic-network',
+    decimals: 18,
   },
   '0x13881': {
     chainId: 80001,
@@ -77,4 +81,12 @@ export const networkConfigs = {
   },
 }
 
-export const getExplorer = chain => networkConfigs[chain]?.blockExplorerUrl
+export const getExplorer = (chain) => networkConfigs[chain]?.blockExplorerUrl;
+
+export const getNativeByChain = (chain) =>
+  networkConfigs[chain]?.currencySymbol || "NATIVE";
+
+export const getChainById = (chain) => networkConfigs[chain]?.chainId || null;
+
+export const getWrappedNative = (chain) =>
+  networkConfigs[chain]?.wrapped || null;

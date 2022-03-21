@@ -10,4 +10,6 @@ export enum Currency {
   USDC,
   YCurve,
   Launchpool,
+  Polygon,
+  Avalanche
 }
