@@ -33,14 +33,14 @@ export const Card: React.FC<CardProps> = (props: CardProps) => {
               `${
                 averagePrice % 1 === 0
                   ? averagePrice.toString()
-                  : averagePrice.toString().slice(0, 3)
+                  : averagePrice.toString().slice(0, 4)
               } ETH`,
             )
             if (response2.data.stats.floor_price !== null) {
               const floorPrice = response2.data.stats.floor_price
               setFloor(
                 `${
-                  averagePrice % 1 === 0 ? floorPrice.toString() : floorPrice.toString().slice(0, 3)
+                  averagePrice % 1 === 0 ? floorPrice.toString() : floorPrice.toString().slice(0, 4)
                 } ETH`,
               )
             }
