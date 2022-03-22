@@ -11,10 +11,10 @@ const MIN_APPROVAL_AMOUNT = '000000000000000000000000000000000000000000000000000
 
 // const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
 
-const calculateAllowance = (web3: Moralis.Web3, allowance: string, decimals: string) => {
+const calculateAllowance = (web3: Web3, allowance: string, decimals: string) => {
   return allowance === MAX_APPROVAL_AMOUNT
     ? 'Unlimited'
-    : Moralis.Units.FromWei(web3.utils.hexToNumberString(`0x${allowance}`), parseInt(decimals, 10))
+    : Moralis.Units.FromWei(web3.utils.hexToNumberString(`0x${allowance}`), parseInt(decimals, 10)) // TODO NOT HEX
 }
 
 const getTokenMetadata = async (

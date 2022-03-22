@@ -3,6 +3,7 @@ import { useERC20Transfers, useNFTTransfers, useMoralis } from 'react-moralis'
 import { ErrorMessage, Loader } from 'components'
 import { getEllipsisText } from 'utils/formatters'
 import { getExplorer } from 'utils/networks'
+import Web3 from 'web3'
 import { GenericTransfer, erc20ToGenericTransfer, nftToGenericTransfer } from './HistoryHelper'
 
 const History = () => {
@@ -54,7 +55,7 @@ const History = () => {
     {
       title: 'Value',
       key: 'value',
-      render: (value, item) => parseFloat(Moralis.Units.FromWei(value, item.decimals).toFixed(6)),
+      render: (value, item) => parseFloat(Web3.utils.fromWei(value, item.decimals)).toFixed(6),
     },
     {
       title: 'Transaction',

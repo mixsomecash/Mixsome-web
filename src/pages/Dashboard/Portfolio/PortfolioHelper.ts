@@ -14,7 +14,7 @@ export type GenericTokenBalance = {
 }
 
 export const getUsdBalance = (tokenBalance: GenericTokenBalance): number =>
-  Moralis.Units.FromWei(tokenBalance.amount, tokenBalance.decimals) * tokenBalance.price
+  parseFloat(Moralis.Units.FromWei(tokenBalance.amount, tokenBalance.decimals)) * tokenBalance.price
 
 const getCoinId = (symbol: string, name: string, coins: CoinGeckoCoin[]): string | null => {
   if (!coins) {
