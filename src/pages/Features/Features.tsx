@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import ReactDOM from 'react-dom'
 import { useMoralis } from 'react-moralis'
+import { FeatureCard } from './FeatureCard'
 
 console.log('test')
 
 const Features = () => {
   const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
+
   const getAllFeatures = async () => {
     if (!isInitialized) return
     const query = await new Moralis.Query('Feature')
@@ -14,17 +16,18 @@ const Features = () => {
 
     features.forEach(x => console.log(x.attributes))
 
-    const listItems = features.map(number => <li>{number.attributes.contributor}</li>)
-    ReactDOM.render(<ul>{listItems}</ul>, document.getElementById('here'))
 
-    /* const existingFeatures = features.map(((item) => (
-      <div key={item.attributes.contributor} className="post">
-        <h3>{item.attributes.contributor} - {item.attributes.contributor}</h3>
-        <p>{item.attributes.contributor}</p>
-      </div>
-    )))} */
-  }
-
+    const listItems = features.map(number => (
+      <li>
+        <FeatureCard title={number.attributes.title} />
+      </li>
+    ))
+    ReactDOM.render(
+      <ul>
+        <li>{listItems}</li>
+      </ul>,
+      document.getElementById('here'),
+    )
   const addFeature = async () => {
     const FeatureObject = await Moralis.Object.extend('Feature')
     const feature = new FeatureObject()
