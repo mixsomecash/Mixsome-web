@@ -10,12 +10,13 @@ import { Button, Card, Modal } from 'antd'
 import { useState } from 'react'
 import { SelectOutlined } from '@ant-design/icons'
 import Text from 'antd/lib/typography/Text'
-import { Web3Provider } from 'react-moralis/lib/hooks/core/useMoralis/_useMoralisWeb3'
 import { getExplorer } from '../../utils/networks'
 import { getEllipsisText } from '../../utils/formatters'
 import Address from '../Address/Address'
 import Blockie from './Blockie'
 import { connectors } from './config'
+
+export declare type Web3Provider = 'wc' | 'walletconnect'
 
 const styles = {
   account: {
