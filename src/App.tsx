@@ -26,8 +26,9 @@ const App = () => {
             <Route path="/pools" component={Pools} exact />
             <Route path="/dashboard" component={Dashboard} exact />
             <Route path="/flows/:id" component={Flow} exact />
-            <Route path="/1inch" component={Dex} exact />
             <Route path="/features" component={Features} exact />
+            <Route path="/1inch" component={Dex} exact />
+
             <Route component={Page404} />
           </Switch>
         </div>
