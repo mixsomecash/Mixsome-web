@@ -15,7 +15,7 @@ const Features = () => {
 
     const listItems = features.map(number => (
       <li>
-        <FeatureCard title={number.attributes.title} />
+        <FeatureCard title={number.attributes.title} description={number.attributes.description} />
       </li>
     ))
     ReactDOM.render(
