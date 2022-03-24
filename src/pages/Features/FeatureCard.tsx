@@ -1,17 +1,28 @@
 import React, { Component } from 'react'
-
+import { useMoralis } from 'react-moralis'
 import { CaretUpOutlined } from '@ant-design/icons'
 
 interface CardProps {
   title: string
   description: string
+  parentMethod(): boolean
 }
 
 export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
-  const { title, description } = props
+  const { title, description, parentMethod } = props
+
+  function likeFeature() {
+    console.log('feature')
+  }
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div
+      tabIndex={-1}
+      role="button"
+      style={{ display: 'flex' }}
+      onClick={() => parentMethod()}
+      onKeyDown={likeFeature}
+    >
       <div
         style={{
           width: '70px',

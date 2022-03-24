@@ -13,9 +13,17 @@ const Features = () => {
 
     features.forEach(x => console.log(x.attributes))
 
+    function parentMethod() {
+      return true
+    }
+
     const listItems = features.map(number => (
       <li>
-        <FeatureCard title={number.attributes.title} description={number.attributes.description} />
+        <FeatureCard
+          parentMethod={() => parentMethod()}
+          title={number.attributes.title}
+          description={number.attributes.description}
+        />
       </li>
     ))
     ReactDOM.render(
