@@ -5,14 +5,14 @@ import { CaretUpOutlined } from '@ant-design/icons'
 interface CardProps {
   title: string
   description: string
-  parentMethod(): boolean
+  parentMethod(string): Promise<boolean>
 }
 
 export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
   const { title, description, parentMethod } = props
 
-  function likeFeature() {
-    console.log('feature')
+  function keyClick() {
+    return true
   }
 
   return (
@@ -20,8 +20,8 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
       tabIndex={-1}
       role="button"
       style={{ display: 'flex' }}
-      onClick={() => parentMethod()}
-      onKeyDown={likeFeature}
+      onClick={() => parentMethod('empty')}
+      onKeyDown={keyClick}
     >
       <div
         style={{

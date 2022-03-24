@@ -6,21 +6,32 @@ import { FeatureCard } from './FeatureCard'
 const Features = () => {
   const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
 
+  async function likeFeature(id) {
+    /* like a feature */
+    console.log(`like a feature ${id}`)
+    const FeatureObject = await Moralis.Object.extend('Feature')
+    const query = new Moralis.Query(FeatureObject)
+
+    query.equalTo('objectId', id)
+    const result = await query.find()
+    console.log(result)
+    result[0].set('likes', result[0].attributes.likes + 1)
+    result[0].save()
+
+    return true
+  }
+
   const getAllFeatures = async () => {
     if (!isInitialized) return
     const query = await new Moralis.Query('Feature')
     const features = await query.find()
 
-    features.forEach(x => console.log(x.attributes))
-
-    function parentMethod() {
-      return true
-    }
+    features.forEach(x => console.log(x))
 
     const listItems = features.map(number => (
       <li>
         <FeatureCard
-          parentMethod={() => parentMethod()}
+          parentMethod={() => likeFeature(number.id)}
           title={number.attributes.title}
           description={number.attributes.description}
         />
