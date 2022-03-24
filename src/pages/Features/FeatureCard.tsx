@@ -5,11 +5,12 @@ import { CaretUpOutlined } from '@ant-design/icons'
 interface CardProps {
   title: string
   description: string
+  likes: number
   parentMethod(string): Promise<boolean>
 }
 
 export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
-  const { title, description, parentMethod } = props
+  const { title, description, parentMethod, likes } = props
 
   function keyClick() {
     return true
@@ -18,6 +19,7 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
   return (
     <div
       tabIndex={-1}
+      className="py-2"
       role="button"
       style={{ display: 'flex' }}
       onClick={() => parentMethod('empty')}
@@ -46,7 +48,7 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
           }}
           className="text-center font-bold "
         >
-          13
+          {likes}
         </h1>
       </div>
       <div className="pl-2">

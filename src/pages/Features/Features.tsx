@@ -8,15 +8,27 @@ const Features = () => {
 
   async function likeFeature(id) {
     /* like a feature */
-    console.log(`like a feature ${id}`)
-    const FeatureObject = await Moralis.Object.extend('Feature')
-    const query = new Moralis.Query(FeatureObject)
 
-    query.equalTo('objectId', id)
-    const result = await query.find()
-    console.log(result)
-    result[0].set('likes', result[0].attributes.likes + 1)
-    result[0].save()
+    if (account !== null) {
+      const FeatureObject = await Moralis.Object.extend('Feature')
+      const query = new Moralis.Query(FeatureObject)
+
+      query.equalTo('objectId', id)
+      const result = await query.find()
+
+      const supporterArray = result[0].attributes.supporters
+      if (!supporterArray.includes(account)) {
+        console.log(`like`)
+        result[0].set('likes', result[0].attributes.likes + 1)
+        result[0].addUnique('supporters', account)
+        result[0].save()
+      } else {
+        console.log(`dislike`)
+        result[0].set('likes', result[0].attributes.likes - 1)
+        result[0].remove('supporters', account)
+        result[0].save()
+      }
+    }
 
     return true
   }
@@ -33,6 +45,7 @@ const Features = () => {
         <FeatureCard
           parentMethod={() => likeFeature(number.id)}
           title={number.attributes.title}
+          likes={number.attributes.likes}
           description={number.attributes.description}
         />
       </li>
@@ -58,7 +71,7 @@ const Features = () => {
     feature.set('description', featureDescription)
     feature.set('contributor', account)
     feature.set('likes', 1)
-    feature.addUnique('supporter', account)
+    feature.addUnique('supporters', account)
     feature.save()
   }
 
