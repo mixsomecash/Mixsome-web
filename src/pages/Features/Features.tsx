@@ -9,28 +9,29 @@ const Features = () => {
   async function likeFeature(id) {
     /* like a feature */
 
+    const FeatureObject = await Moralis.Object.extend('Feature')
+    const query = new Moralis.Query(FeatureObject)
+    query.equalTo('objectId', id)
+    const result = await query.find()
+    let response = { likes: result[0].attributes.likes, isLiked: false }
+
     if (account !== null) {
-      const FeatureObject = await Moralis.Object.extend('Feature')
-      const query = new Moralis.Query(FeatureObject)
-
-      query.equalTo('objectId', id)
-      const result = await query.find()
-
       const supporterArray = result[0].attributes.supporters
       if (!supporterArray.includes(account)) {
         console.log(`like`)
         result[0].set('likes', result[0].attributes.likes + 1)
         result[0].addUnique('supporters', account)
         result[0].save()
+        response = { likes: result[0].attributes.likes, isLiked: true }
       } else {
         console.log(`dislike`)
         result[0].set('likes', result[0].attributes.likes - 1)
         result[0].remove('supporters', account)
         result[0].save()
+        response = { likes: result[0].attributes.likes, isLiked: false }
       }
     }
-
-    return true
+    return JSON.stringify(response)
   }
 
   const getAllFeatures = async () => {
@@ -46,6 +47,7 @@ const Features = () => {
           parentMethod={() => likeFeature(number.id)}
           title={number.attributes.title}
           likes={number.attributes.likes}
+          isLiked={number.attributes.supporters.includes(account)}
           description={number.attributes.description}
         />
       </li>

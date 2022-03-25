@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import { useMoralis } from 'react-moralis'
 import { CaretUpOutlined } from '@ant-design/icons'
 
@@ -6,11 +6,15 @@ interface CardProps {
   title: string
   description: string
   likes: number
-  parentMethod(string): Promise<boolean>
+  parentMethod(string): Promise<string>
+  isLiked: boolean
 }
 
 export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
-  const { title, description, parentMethod, likes } = props
+  const { title, description, parentMethod, likes, isLiked } = props
+  const [like, setLike] = useState(likes)
+  console.log(isLiked)
+  const [isFeatureLiked, setIsLiked] = useState(isLiked)
 
   function keyClick() {
     return true
@@ -22,14 +26,18 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
       className="py-2"
       role="button"
       style={{ display: 'flex' }}
-      onClick={() => parentMethod('empty')}
+      onClick={async () => {
+        const newLike = await parentMethod('empty')
+        setIsLiked(JSON.parse(newLike).isLiked)
+        setLike(JSON.parse(newLike).likes)
+      }}
       onKeyDown={keyClick}
     >
       <div
         style={{
           width: '70px',
           height: '70px',
-          backgroundColor: 'white',
+          backgroundColor: isFeatureLiked !== true ? 'white' : '#6EEB7E',
           border: '2px solid #979797',
           borderRadius: '4px',
         }}
@@ -48,7 +56,7 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
           }}
           className="text-center font-bold "
         >
-          {likes}
+          {like}
         </h1>
       </div>
       <div className="pl-2">
