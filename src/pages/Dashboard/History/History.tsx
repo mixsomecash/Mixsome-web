@@ -1,33 +1,43 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useERC20Transfers, useNFTTransfers, useMoralis } from 'react-moralis'
 import { ErrorMessage, Loader } from 'components'
 import { getEllipsisText } from 'utils/formatters'
 import { getExplorer } from 'utils/networks'
-import { GenericTransfer, erc20ToGenericTransfer, nftToGenericTransfer } from './HistoryHelper'
+import { ChainId } from 'types/moralis'
+import {
+  GenericTransfer,
+  erc20ToGenericTransfer,
+  nftToGenericTransfer,
+  getSymbolsByAddresses,
+} from './HistoryHelper'
 
 const History = () => {
-  const { Moralis, chainId, isAuthenticated, account } = useMoralis()
+  const { Moralis, chainId, account, isAuthenticated } = useMoralis()
   const { data: erc20Data, isLoading: isLoadingERC20 } = useERC20Transfers({
-    address: account ?? undefined,
+    address: account ?? '',
   })
-  const { data: nftData, isLoading: isLoadingNFT } = useNFTTransfers({
-    address: account ?? undefined,
-  })
-
+  const { data: nftData, isLoading: isLoadingNFT } = useNFTTransfers({ address: account ?? '' })
   const [allTransfers, setAllTransfers] = useState<GenericTransfer[] | null>(null)
 
   useEffect(() => {
-    if (!erc20Data || !nftData) {
-      return
-    }
+    ;(async () => {
+      if (!erc20Data?.result || !nftData || !chainId) {
+        return
+      }
 
-    const erc20Transfers = ((erc20Data as any).result as any[]).map(erc20ToGenericTransfer)
-    const nftTransfers = nftData.result.map(nftToGenericTransfer)
-    const combinedTransfers = [...erc20Transfers, ...nftTransfers].sort(
-      (a, b) => new Date(b.blockTimestamp).getTime() - new Date(a.blockTimestamp).getTime(),
-    )
-    setAllTransfers(combinedTransfers)
-  }, [erc20Data, nftData])
+      const tokenAddresses = Array.from(new Set(erc20Data.result.map(data => data.address)))
+      const tokenSymbols = await getSymbolsByAddresses(tokenAddresses, chainId as ChainId)
+
+      const erc20Transfers = erc20Data.result.map(data =>
+        erc20ToGenericTransfer(data, tokenSymbols),
+      )
+      const nftTransfers = nftData.result.map(nftToGenericTransfer)
+      const combinedTransfers = [...erc20Transfers, ...nftTransfers].sort(
+        (a, b) => new Date(b.blockTimestamp).getTime() - new Date(a.blockTimestamp).getTime(),
+      )
+      setAllTransfers(combinedTransfers)
+    })()
+  }, [erc20Data, nftData, chainId])
 
   if (!isAuthenticated || !account || !chainId) {
     return <ErrorMessage message="Please connect to your wallet" />
@@ -37,9 +47,19 @@ const History = () => {
 
   const columns = [
     {
-      title: 'Token',
-      key: 'address',
-      render: (token: string) => getEllipsisText(token, 8),
+      title: 'Symbol',
+      key: 'symbol',
+      render: (item: string) => item.toUpperCase(),
+    },
+    {
+      title: 'IN/OUT',
+      key: 'toAddress',
+      render: (to: string) =>
+        to === account ? (
+          <div className="text-green font-bold">IN</div>
+        ) : (
+          <div className="text-green font-bold">OUT</div>
+        ),
     },
     {
       title: 'From',

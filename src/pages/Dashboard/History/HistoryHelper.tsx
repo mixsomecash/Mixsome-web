@@ -1,5 +1,9 @@
+import Moralis from 'moralis'
+import { ChainId } from 'types/moralis'
+
 export type GenericTransfer = {
   address: string
+  symbol?: string
   fromAddress: string
   toAddress: string
   value: string
@@ -8,8 +12,9 @@ export type GenericTransfer = {
   type: 'erc20' | 'nft'
 }
 
-export const erc20ToGenericTransfer = (erc20Transfer): GenericTransfer => ({
+export const erc20ToGenericTransfer = (erc20Transfer, tokenSymbols): GenericTransfer => ({
   address: erc20Transfer.address,
+  symbol: tokenSymbols[erc20Transfer.address],
   fromAddress: erc20Transfer.from_address,
   toAddress: erc20Transfer.to_address,
   value: erc20Transfer.value,
@@ -27,3 +32,15 @@ export const nftToGenericTransfer = (nftTransfer): GenericTransfer => ({
   blockTimestamp: nftTransfer.block_timestamp,
   type: 'nft',
 })
+
+export const getSymbolsByAddresses = async (addresses: string[], chainId: ChainId) => {
+  const tokenMetadata = await Moralis.Web3API.token.getTokenMetadata({
+    chain: chainId,
+    addresses,
+  })
+  const result = {}
+  tokenMetadata.forEach(metadata => {
+    result[metadata.address] = metadata.symbol
+  })
+  return result
+}
