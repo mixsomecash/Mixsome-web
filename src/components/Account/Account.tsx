@@ -1,13 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable import/no-named-as-default */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable no-console */
-/* eslint-disable react/react-in-jsx-scope */
+import React, { useEffect, useState } from 'react'
 import { useMoralis } from 'react-moralis'
+import { Button as CustomButton } from 'components'
 import { Button, Card, Modal } from 'antd'
-import { useState } from 'react'
 import { SelectOutlined } from '@ant-design/icons'
 import Text from 'antd/lib/typography/Text'
 import { getExplorer } from '../../utils/networks'
@@ -53,17 +47,41 @@ const styles = {
   },
 }
 
-function Account() {
-  const { authenticate, isAuthenticated, account, chainId, logout } = useMoralis()
+const Account = () => {
+  const { authenticate, isAuthenticated, isInitialized, account, chainId, logout } = useMoralis()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false)
+
+  const connectToWallet = async (connectorId: Web3Provider) => {
+    try {
+      await authenticate({ provider: connectorId })
+      window.localStorage.setItem('connectorId', connectorId)
+      setIsAuthModalVisible(false)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  useEffect(() => {
+    if (!isInitialized) {
+      return
+    }
+    const connectorId = window.localStorage.getItem('connectorId')
+    if (connectorId) {
+      ;(async () => {
+        try {
+          await authenticate({ provider: connectorId as Web3Provider })
+        } catch (e) {
+          console.error(e)
+        }
+      })()
+    }
+  }, [authenticate, isInitialized])
 
   if (!isAuthenticated || !account) {
     return (
       <>
-        <div onClick={() => setIsAuthModalVisible(true)}>
-          <p style={styles.text}>Connect To Wallet</p>
-        </div>
+        <CustomButton text="Connect To Wallet" onClick={() => setIsAuthModalVisible(true)} />
         <Modal
           visible={isAuthModalVisible}
           footer={null}
@@ -88,23 +106,16 @@ function Account() {
             Connect Wallet
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            {connectors.map(({ title, icon, connectorId }, key) => (
-              <div
+            {connectors.map(({ title, icon, connectorId }) => (
+              <button
+                type="button"
                 style={styles.connector}
-                key={key}
-                onClick={async () => {
-                  try {
-                    await authenticate({ provider: connectorId as Web3Provider })
-                    window.localStorage.setItem('connectorId', connectorId)
-                    setIsAuthModalVisible(false)
-                  } catch (e) {
-                    console.error(e)
-                  }
-                }}
+                key={title}
+                onClick={() => connectToWallet(connectorId as Web3Provider)}
               >
                 <img src={icon} alt={title} style={styles.icon} />
                 <Text style={{ fontSize: '14px' }}>{title}</Text>
-              </div>
+              </button>
             ))}
           </div>
         </Modal>
@@ -114,26 +125,10 @@ function Account() {
 
   return (
     <>
-      {/* <button
-        onClick={async () => {
-          try {
-            console.log("change")
-            await web3._provider.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: "0x38" }],
-            });
-            console.log("changed")
-          } catch (e) {
-            console.error(e);
-          }
-        }}
-      >
-        Hi
-      </button> */}
-      <div style={styles.account} onClick={() => setIsModalVisible(true)}>
+      <button type="button" style={styles.account} onClick={() => setIsModalVisible(true)}>
         <p style={{ marginRight: '5px', ...styles.text }}>{getEllipsisText(account, 6)}</p>
         <Blockie currentWallet scale={3} />
-      </div>
+      </button>
       <Modal
         visible={isModalVisible}
         footer={null}

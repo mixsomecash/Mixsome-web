@@ -32,37 +32,6 @@ const getTokenMetadata = async (
   }
 }
 
-// const getFunctionName = async (signatureBytesString): Promise<string | null> => {
-//   try {
-//     const signatureResponse = await fetch(`${SIGNATURES_URL}${signatureBytesString}`)
-//     if (!signatureResponse.ok) {
-//       return null
-//     }
-//     const signature = await signatureResponse.text()
-//     const functionName = signature.split('(')[0]
-//     return functionName
-//   } catch (err) {
-//     return null
-//   }
-// }
-
-// const getAllowance = async (native, chainId) => {
-//   try {
-//     const { allowance } = await Moralis.Web3API.token.getTokenAllowance({
-//       chain: chainId,
-//       owner_address: `0x${native.logs[0]?.topic1?.slice(-40)}`,
-//       spender_address: `0x${native.logs[0]?.topic2?.slice(-40)}`,
-//       address: native.logs[0]?.address,
-//     })
-//     return { allowance, spenderAddress: `0x${native.logs[0]?.topic2?.slice(-40)}` }
-//   } catch (err) {
-//     return {
-//       allowance: 0,
-//       spenderAddress: 'N/A',
-//     }
-//   }
-// }
-
 const parseApproveInputData = (input_data: string) => {
   if (input_data.length !== 138) {
     return {
@@ -127,23 +96,6 @@ export const getApprovals = async (
     }),
   )
   const metadatas = await getTokenMetadata(addresses, chainId)
-  //  metadatas => {
-  //   approvals.map(transaction => {
-  //     const myMetaData = metadatas?.find(token => token.address === transaction?.contractAddress)
-  //     if (!myMetaData) {
-  //       return transaction
-  //     }
-  //     return {
-  //       ...transaction,
-  //       allowance: calculateAllowance(
-  //         web3,
-  //         transaction?.allowance || '0',
-  //         myMetaData?.decimals || '18',
-  //       ),
-  //       metadata: myMetaData,
-  //     }
-  //   })
-  // })
 
   return approvals
     .map(transaction => {
@@ -159,22 +111,6 @@ export const getApprovals = async (
     })
     .filter(transaction => !!transaction && transaction.allowance !== '0') as ApprovalTransactions[]
 }
-
-// export const revoke = async (
-//   accountAddress: string | null,
-//   contractAddress: string | null,
-//   chainId: ChainId,
-// ) => {
-//   const { message } = await Moralis.Plugins.oneInch.approve({
-//     chain: chainId,
-//     fromAddress: accountAddress,
-//     tokenAddress: contractAddress,
-//   })
-//   notification.info({
-//     message: 'Error',
-//     description: message,
-//   })
-// }
 
 export const revokeTokens = async (
   contract_address: string,
