@@ -81,7 +81,7 @@ const Invest = (props: Props) => {
     return (
       reserves?.map((res, i) => ({
         date: dates[i],
-        value: Moralis.Units.FromWei(res.reserve0, parseFloat(pair.token0.decimals)),
+        value: parseFloat(Moralis.Units.FromWei(res.reserve0, parseFloat(pair.token0.decimals))),
       })) ?? null
     )
   }

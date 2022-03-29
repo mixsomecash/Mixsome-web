@@ -10,11 +10,11 @@ export type PoolInfo = {
 export type PoolContractData = {
   token: MoralisToken
   apy: number
-  stakedTotal: number
-  poolSize: number
+  stakedTotal: string
+  poolSize: string
   maturityDays: number
   launchTime: number
   closingTime: number
-  accountStaked: number | null
+  accountStaked: string | null
   accountStakedTime: number | null
 }

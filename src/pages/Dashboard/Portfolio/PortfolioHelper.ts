@@ -9,12 +9,12 @@ export type GenericTokenBalance = {
   name: string
   symbol: string
   decimals: number
-  amount: number
+  amount: string
   price: number
 }
 
 export const getUsdBalance = (tokenBalance: GenericTokenBalance): number =>
-  Moralis.Units.FromWei(tokenBalance.amount, tokenBalance.decimals) * tokenBalance.price
+  parseFloat(Moralis.Units.FromWei(tokenBalance.amount, tokenBalance.decimals)) * tokenBalance.price
 
 const getCoinId = (symbol: string, name: string, coins: CoinGeckoCoin[]): string | null => {
   if (!coins) {
@@ -73,7 +73,7 @@ export const getTokenBalances = async (
     name: nativeTokenMarketData.name,
     symbol: nativeTokenMarketData.symbol,
     decimals: currentNetwork.decimals,
-    amount: parseFloat(nativeTokenBalance.balance) ?? 0,
+    amount: nativeTokenBalance.balance ?? 0,
     price: nativeTokenMarketData.current_price || 0,
   }
 
@@ -82,7 +82,7 @@ export const getTokenBalances = async (
       const tokenPrice = await Moralis.Web3API.token
         .getTokenPrice({
           address: token.token_address,
-          chain: chainId as '0x1' | '0x38' | '0x89' |'0xa86a'
+          chain: chainId as '0x1' | '0x38' | '0x89' | '0xa86a',
         })
         .catch(() => null)
 
@@ -96,7 +96,7 @@ export const getTokenBalances = async (
         name: token.name,
         symbol: token.symbol,
         decimals: parseFloat(token.decimals),
-        amount: parseFloat(token.balance),
+        amount: token.balance,
         price: tokenPrice?.usdPrice || 0,
       }
     }),

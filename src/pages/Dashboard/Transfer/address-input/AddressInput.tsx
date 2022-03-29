@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useMoralis, useMoralisWeb3Api } from 'react-moralis'
+import { Moralis } from 'moralis'
 import { Input } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import Text from 'antd/lib/typography/Text'
@@ -20,7 +21,6 @@ interface AddressInputProps {
 
 export const AddressInput: React.FC<AddressInputProps> = (props: AddressInputProps) => {
   const { autoFocus, onChange, placeholder, style } = props
-  const { web3 } = useMoralis()
   const [address, setAddress] = useState('')
   const [validatedAddress, setValidatedAddress] = useState('')
   const [isDomain, setIsDomain] = useState(false)
@@ -62,7 +62,7 @@ export const AddressInput: React.FC<AddressInputProps> = (props: AddressInputPro
             })
         }
         if (value.endsWith('.eth')) {
-          processPromise(web3?.eth.ens.getAddress(value))
+          processPromise(Moralis.Web3API.resolve.resolveDomain(value))
         } else {
           processPromise(
             resolveDomain({
@@ -78,7 +78,7 @@ export const AddressInput: React.FC<AddressInputProps> = (props: AddressInputPro
         setIsDomain(false)
       }
     },
-    [resolveDomain, web3],
+    [resolveDomain],
   )
 
   return (

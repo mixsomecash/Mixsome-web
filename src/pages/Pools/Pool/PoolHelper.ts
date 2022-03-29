@@ -22,7 +22,6 @@ export const getPoolContractData = async (
   poolInfo: PoolInfo,
   account: string,
 ): Promise<PoolContractData | null> => {
-  await Moralis.Web3.enableWeb3()
   const tokenAddress = await runPoolContractFunction(poolInfo, 'tokenERC20')
   if (!tokenAddress) {
     return null
@@ -55,12 +54,12 @@ export const getPoolContractData = async (
     return {
       token,
       apy: parseFloat(apy),
-      stakedTotal: parseFloat(stakedTotal),
-      poolSize: parseFloat(poolSize),
+      stakedTotal,
+      poolSize,
       maturityDays: parseFloat(maturityDays),
       launchTime: parseFloat(launchTime),
       closingTime: parseFloat(closingTime),
-      accountStaked: parseFloat(accountStaked),
+      accountStaked,
       accountStakedTime: parseFloat(accountStakedTime),
     }
   }
@@ -68,9 +67,12 @@ export const getPoolContractData = async (
 }
 
 export const withdrawTokens = async (poolInfo: PoolInfo, account: string) => {
-  const connector = await (Moralis as any).enableWeb3()
-  const pool = new connector.eth.Contract(poolAbi as AbiItem[], poolInfo.address)
-  await pool.methods.withdraw().send({ from: account })
+  const tx = await Moralis.executeFunction({
+    contractAddress: poolInfo.address,
+    functionName: 'withdraw',
+    abi: poolAbi,
+  })
+  await (tx as any).wait()
 }
 
 export const checkAllowance = async (
@@ -78,9 +80,12 @@ export const checkAllowance = async (
   poolToken: MoralisToken,
   account: string,
 ) => {
-  const connector = await Moralis.Web3.enableWeb3()
-  const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], poolToken.address)
-  const result = await tokenContract.methods.allowance(account, poolInfo.address).call()
+  const result = (await Moralis.executeFunction({
+    contractAddress: poolToken.address,
+    functionName: 'allowance',
+    abi: tokenAbi,
+    params: { owner: account, spender: poolInfo.address },
+  })) as any
   return result !== '0'
 }
 
@@ -90,11 +95,13 @@ export const approveTokens = async (
   account: string,
 ) => {
   try {
-    const connector = await Moralis.Web3.enableWeb3()
-    const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], poolToken.address)
-    await tokenContract.methods
-      .approve(poolInfo.address, '1157920892373161954235709850086879078')
-      .send({ from: account })
+    const tx = await Moralis.executeFunction({
+      contractAddress: poolToken.address,
+      functionName: 'approve',
+      abi: tokenAbi,
+      params: { spender: poolInfo.address, amount: '1157920892373161954235709850086879078' },
+    })
+    await (tx as any).wait()
     return true
   } catch {
     return false
@@ -108,11 +115,15 @@ export const stakeTokens = async (
   account: string,
 ) => {
   try {
-    const connector = await Moralis.Web3.enableWeb3()
     const amountWei = amount * 10 ** parseFloat(poolContractData.token.decimals)
     const amountWeiString = amountWei.toLocaleString('fullwide', { useGrouping: false })
-    const tokenContract = new connector.eth.Contract(poolAbi as AbiItem[], poolInfo.address)
-    await tokenContract.methods.stake(amountWeiString).send({ from: account })
+    const tx = await Moralis.executeFunction({
+      contractAddress: poolInfo.address,
+      functionName: 'stake',
+      abi: poolAbi,
+      params: { amount: amountWeiString },
+    })
+    await (tx as any).wait()
     return true
   } catch {
     return false

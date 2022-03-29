@@ -150,7 +150,9 @@ const Pool = ({ pool }: Props) => {
               ))}
               <Progress
                 completed={Math.round(
-                  (poolContractData.stakedTotal / poolContractData.poolSize) * 100,
+                  (parseFloat(poolContractData.stakedTotal) /
+                    parseFloat(poolContractData.poolSize)) *
+                    100,
                 )}
               />
             </div>
