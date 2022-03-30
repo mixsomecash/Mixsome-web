@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { Component, useState, useEffect } from 'react'
 import { useMoralis } from 'react-moralis'
 import { CaretUpOutlined } from '@ant-design/icons'
 
@@ -13,8 +13,13 @@ interface CardProps {
 export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
   const { title, description, parentMethod, likes, isLiked } = props
   const [like, setLike] = useState(likes)
-  console.log(isLiked)
   const [isFeatureLiked, setIsLiked] = useState(isLiked)
+  console.log(isFeatureLiked)
+  console.log(isLiked)
+
+  useEffect(() => {
+    setIsLiked(isLiked)
+  }, [isLiked])
 
   function keyClick() {
     return true

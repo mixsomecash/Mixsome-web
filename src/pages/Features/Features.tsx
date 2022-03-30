@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
+import { message } from 'antd'
 import { useMoralis } from 'react-moralis'
 import { FeatureCard } from './FeatureCard'
+import ModalComponent from './submitFeature'
 
 const Features = () => {
   const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
@@ -14,8 +16,9 @@ const Features = () => {
     query.equalTo('objectId', id)
     const result = await query.find()
     let response = { likes: result[0].attributes.likes, isLiked: false }
+    console.log(account)
 
-    if (account !== null) {
+    if (account != null) {
       const supporterArray = result[0].attributes.supporters
       if (!supporterArray.includes(account)) {
         console.log(`like`)
@@ -30,6 +33,8 @@ const Features = () => {
         result[0].save()
         response = { likes: result[0].attributes.likes, isLiked: false }
       }
+    } else {
+      message.info('Connect your wallet to like a feature')
     }
     return JSON.stringify(response)
   }
@@ -39,7 +44,7 @@ const Features = () => {
     const query = await new Moralis.Query('Feature')
     const features = await query.find()
 
-    features.forEach(x => console.log(x))
+    features.forEach(x => console.log(x.attributes.supporters.includes(account)))
 
     const listItems = features.map(number => (
       <li>
@@ -60,34 +65,40 @@ const Features = () => {
     )
   }
 
-  const addFeature = async () => {
-    const FeatureObject = await Moralis.Object.extend('Feature')
-    const feature = new FeatureObject()
-    const featureTitle = (document.getElementById('featureTitle') as HTMLInputElement).value
-    const featureDescription = (document.getElementById('featureDescription') as HTMLInputElement)
-      .value
-    console.log(featureTitle)
-    console.log(featureDescription)
-    console.log(account)
-    feature.set('title', featureTitle)
-    feature.set('description', featureDescription)
-    feature.set('contributor', account)
-    feature.set('likes', 1)
-    feature.addUnique('supporters', account)
-    feature.save()
-  }
-
   useEffect(() => {
     getAllFeatures()
   })
 
   return (
     <div className="font-mono text-center">
-      <input type="text" id="featureTitle" />
-      <input type="text" id="featureDescription" />
-      <button type="submit" onClick={addFeature}>
-        new Feature
-      </button>
+      <div
+        style={{
+          width: '455px',
+          height: '180px',
+          backgroundColor: '#323232',
+          position: 'fixed',
+          right: '0px',
+        }}
+      >
+        <div className="p-5">
+          <p
+            className="text-left"
+            style={{
+              color: '#FBFBFB',
+              fontFamily: 'DM Sans',
+              maxWidth: '246px',
+              fontSize: '18px',
+              lineHeight: '23px',
+            }}
+          >
+            What new features would you like to see for Mixsome?
+          </p>
+          <div className="pt-3">
+            <ModalComponent></ModalComponent>
+          </div>
+        </div>
+      </div>
+
       <div id="here"></div>
     </div>
   )
