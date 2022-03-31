@@ -60,7 +60,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = (props: AssetSelector
                 <p>{item.symbol}</p>
                 {item.balance && (
                   <p style={{ alignSelf: 'right' }}>
-                    ({parseFloat(Moralis.Units.FromWei(item.balance, item.decimals).toFixed(6))})
+                    ({parseFloat(Moralis.Units.FromWei(item.balance, item.decimals)).toFixed(6)})
                   </p>
                 )}
               </div>

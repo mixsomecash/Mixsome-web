@@ -92,7 +92,7 @@ const Portfolio = ({ onNetWorthChange }: Props) => {
       title: 'Amount',
       key: 'amount',
       render: (item: GenericTokenBalance) =>
-        Moralis.Units.FromWei(item.amount, item.decimals).toFixed(4),
+        parseFloat(Moralis.Units.FromWei(item.amount, item.decimals)).toFixed(4),
     },
     {
       title: 'Balance',

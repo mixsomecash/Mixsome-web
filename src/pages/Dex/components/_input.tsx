@@ -20,7 +20,7 @@ export const Input: React.FC<InputProps> = (props: InputProps) => {
 
   const onChange = inputValue => setValue(inputValue)
 
-  const toValue = !value ? value : Moralis.Units.FromWei(value, decimals).toFixed(6)
+  const toValue = !value ? value : parseFloat(Moralis.Units.FromWei(value, decimals)).toFixed(6)
 
   return (
     <InputNumber

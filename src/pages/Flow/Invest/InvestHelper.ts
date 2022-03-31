@@ -14,7 +14,7 @@ export const getInvestToken = async (
   return {
     ...token,
     decimals: parseFloat(token.decimals),
-    reserve: Moralis.Units.FromWei(reserve, parseFloat(token.decimals)),
+    reserve: parseFloat(Moralis.Units.FromWei(reserve, parseFloat(token.decimals))),
     price: price.usdPrice,
   }
 }
