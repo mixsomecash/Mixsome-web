@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { CloseOutlined, CopyOutlined, LoadingOutlined } from '@ant-design/icons'
 import { notification } from 'antd'
 import { ErrorMessage, Loader } from 'components'
@@ -64,7 +65,7 @@ const Approval = () => {
         })
       } else {
         notification.error({
-          message: 'Error',
+          message: 'Failed to Revoke',
           description: message,
         })
       }
@@ -111,7 +112,29 @@ const Approval = () => {
               {getEllipsisText(transaction.contractAddress)}
             </a>
           )}
-          {chainId !== '0x38' && chainId !== '0x1' && (
+          {chainId === '0xa86a' && (
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`https://snowtrace.io/tx/${transaction.transactionHash}`}
+              className="text-light hover:text-black block px-4 py-2 text-sm"
+              tabIndex={-1}
+            >
+              {getEllipsisText(transaction.contractAddress)}
+            </a>
+          )}
+          {chainId === '0x89' && (
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`https://polygonscan.com/tx/${transaction.transactionHash}`}
+              className="text-light hover:text-black block px-4 py-2 text-sm"
+              tabIndex={-1}
+            >
+              {getEllipsisText(transaction.contractAddress)}
+            </a>
+          )}
+          {chainId !== '0x38' && chainId !== '0x1' && '0x89' && chainId !== '0xa86a' && (
             <a
               target="_blank"
               rel="noreferrer"
