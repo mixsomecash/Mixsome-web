@@ -1,5 +1,5 @@
 import { Moralis } from 'moralis'
-import { ChainId } from 'types/moralis'
+import { ChainId , MoralisToken } from 'types/moralis'
 import tokenAbi from 'utils/ERC20.json'
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
@@ -8,8 +8,6 @@ import { ApprovalTransactions, TokenMetadata } from './types'
 const APPROVE_SHA3 = '0x095ea7b3'
 const MAX_APPROVAL_AMOUNT = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 const MIN_APPROVAL_AMOUNT = '0000000000000000000000000000000000000000000000000000000000000000'
-
-// const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
 
 const calculateAllowance = (allowance: string, decimals: string) => {
   return allowance === MAX_APPROVAL_AMOUNT
@@ -113,13 +111,13 @@ export const getApprovals = async (
 }
 
 export const revokeTokens = async (
-  contract_address: string,
-  spender_address: string,
+  contract_address: MoralisToken,
+  spender_address: MoralisToken,
   account: string | null,
   cb: ({ isSuccess, message }) => void,
 ) => {
   try {
-    const connector = await Moralis.Web3.enableWeb3()
+    const connector = await (Moralis as any).enableWeb3()
     const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], contract_address)
     await tokenContract.methods.approve(spender_address, '0').send({ from: account })
     cb({
