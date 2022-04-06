@@ -1,17 +1,26 @@
 import React, { useState } from 'react'
-import { Modal, Button, Input } from 'antd'
+import { Modal, Button, Input, message } from 'antd'
 import { useMoralis } from 'react-moralis'
 
 const { TextArea } = Input
 
-const ModalComponent = () => {
+interface CardProps {
+  parentMethod(string): Promise<number>
+}
+
+const ModalComponent = (props: CardProps) => {
+  const { parentMethod } = props
   const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [titleValue, setTitleValue] = useState('')
   const [descriptionValue, setDescriptionValue] = useState('')
 
   const showModal = () => {
-    setIsModalVisible(true)
+    if (account) {
+      setIsModalVisible(true)
+    } else {
+      message.info('Connect your wallet to propose a feature')
+    }
   }
 
   const addFeature = async () => {
@@ -20,22 +29,22 @@ const ModalComponent = () => {
       const feature = new FeatureObject()
       const featureTitle = titleValue
       const featureDescription = descriptionValue
-      console.log(featureDescription)
-      console.log(account)
       feature.set('title', featureTitle)
       feature.set('description', featureDescription)
       feature.set('contributor', account)
       feature.set('likes', 1)
       feature.addUnique('supporters', account)
-      feature.save()
+      const storageObject = await feature.save()
       setIsModalVisible(false)
-    } else {
-      alert('Connect wallet to submit your feature')
+      return { id: storageObject.id, title: featureTitle, description: featureDescription }
     }
+    alert('Connect wallet to submit your feature')
+    return undefined
   }
 
-  const handleOk = () => {
-    addFeature()
+  const handleOk = async () => {
+    const returnedStoredObject = await addFeature()
+    parentMethod(returnedStoredObject)
   }
 
   const handleCancel = () => {
@@ -49,7 +58,9 @@ const ModalComponent = () => {
           role="button"
           tabIndex={-1}
           onClick={showModal}
-          onKeyDown={() => console.log('')}
+          onKeyDown={() => {
+            return null
+          }}
           className="text-right"
           style={{
             display: 'inline-flex',
@@ -74,7 +85,7 @@ const ModalComponent = () => {
         <p className="pt-5 pl-2">TITLE</p>
         <Input
           id="featureTitle"
-          placeholder="Basic usage"
+          placeholder="Short, descriptive title"
           onChange={e => {
             setTitleValue(e.target.value)
           }}
@@ -86,7 +97,7 @@ const ModalComponent = () => {
             setDescriptionValue(e.target.value)
           }}
           rows={4}
-          placeholder="maxLength is 6"
+          placeholder="Any additional details..."
           maxLength={300}
         />
       </Modal>

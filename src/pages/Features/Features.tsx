@@ -16,18 +16,14 @@ const Features = () => {
     query.equalTo('objectId', id)
     const result = await query.find()
     let response = { likes: result[0].attributes.likes, isLiked: false }
-    console.log(account)
-
     if (account != null) {
       const supporterArray = result[0].attributes.supporters
       if (!supporterArray.includes(account)) {
-        console.log(`like`)
         result[0].set('likes', result[0].attributes.likes + 1)
         result[0].addUnique('supporters', account)
         result[0].save()
         response = { likes: result[0].attributes.likes, isLiked: true }
       } else {
-        console.log(`dislike`)
         result[0].set('likes', result[0].attributes.likes - 1)
         result[0].remove('supporters', account)
         result[0].save()
@@ -39,12 +35,21 @@ const Features = () => {
     return JSON.stringify(response)
   }
 
-  const getAllFeatures = async () => {
+  const getAllFeatures = async newAdded => {
     if (!isInitialized) return
     const query = await new Moralis.Query('Feature')
     const features = await query.find()
 
-    features.forEach(x => console.log(x.attributes.supporters.includes(account)))
+    function compare(a, b) {
+      if (a.attributes.supporters.length > b.attributes.supporters.length) {
+        return -1
+      }
+      if (a.attributes.supporters.length < b.attributes.supporters.length) {
+        return 1
+      }
+      return 0
+    }
+    features.sort(compare)
 
     const listItems = features.map(number => (
       <li>
@@ -57,8 +62,22 @@ const Features = () => {
         />
       </li>
     ))
+
     ReactDOM.render(
       <ul>
+        {newAdded === undefined ? (
+          <></>
+        ) : (
+          <li>
+            <FeatureCard
+              parentMethod={() => likeFeature(newAdded.id)}
+              title={newAdded.title}
+              likes={1}
+              isLiked
+              description={newAdded.description}
+            />
+          </li>
+        )}
         <li>{listItems}</li>
       </ul>,
       document.getElementById('here'),
@@ -66,7 +85,7 @@ const Features = () => {
   }
 
   useEffect(() => {
-    getAllFeatures()
+    getAllFeatures(undefined)
   })
 
   return (
@@ -94,7 +113,12 @@ const Features = () => {
             What new features would you like to see for Mixsome?
           </p>
           <div className="pt-3">
-            <ModalComponent></ModalComponent>
+            <ModalComponent
+              parentMethod={async x => {
+                getAllFeatures(x)
+                return x.id
+              }}
+            ></ModalComponent>
           </div>
         </div>
       </div>

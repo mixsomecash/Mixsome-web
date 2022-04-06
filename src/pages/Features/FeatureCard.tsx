@@ -14,9 +14,6 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
   const { title, description, parentMethod, likes, isLiked } = props
   const [like, setLike] = useState(likes)
   const [isFeatureLiked, setIsLiked] = useState(isLiked)
-  console.log(isFeatureLiked)
-  console.log(isLiked)
-
   useEffect(() => {
     setIsLiked(isLiked)
   }, [isLiked])
