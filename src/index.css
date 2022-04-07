@@ -201,3 +201,25 @@ tbody td {
 .chart__container {
   height: 350px
 }
+
+.submit-window {
+  width: 455px;
+  right: 0px ;
+  position: 'fixed' !important;
+}
+
+.feature-text{
+  max-width: 600px;
+}
+
+
+@media only screen and (max-width: 768px) { 
+  .submit-window {
+    width: 100%;
+    position: relative !important;
+  }
+  .feature-text{
+    width: 85%;
+  }
+}
+
