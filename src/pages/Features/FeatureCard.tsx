@@ -23,7 +23,7 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
   }
 
   return (
-    <div className="py-2" style={{ display: 'flex' }}>
+    <div className="py-3" style={{ display: 'flex' }}>
       <div
         onKeyDown={keyClick}
         tabIndex={-1}
@@ -58,7 +58,7 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
           {like}
         </h1>
       </div>
-      <div className="pl-2" style={{ maxWidth: '600px' }}>
+      <div className="pl-2 feature-text" style={{ hyphens: 'auto' }}>
         <h1 className="text-left text-24 text-regular font-bold">{title}</h1>
         <p className="text-left text-18 opacity-40 text-regular font-bold">{description}</p>
       </div>
