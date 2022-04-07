@@ -23,21 +23,18 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
   }
 
   return (
-    <div
-      tabIndex={-1}
-      className="py-2"
-      role="button"
-      style={{ display: 'flex' }}
-      onClick={async () => {
-        const newLike = await parentMethod('empty')
-        setIsLiked(JSON.parse(newLike).isLiked)
-        setLike(JSON.parse(newLike).likes)
-      }}
-      onKeyDown={keyClick}
-    >
+    <div className="py-2" style={{ display: 'flex' }}>
       <div
+        onKeyDown={keyClick}
+        tabIndex={-1}
+        role="button"
+        onClick={async () => {
+          const newLike = await parentMethod('empty')
+          setIsLiked(JSON.parse(newLike).isLiked)
+          setLike(JSON.parse(newLike).likes)
+        }}
         style={{
-          width: '70px',
+          minWidth: '70px',
           height: '70px',
           backgroundColor: isFeatureLiked !== true ? 'white' : '#6EEB7E',
           border: '2px solid #979797',
@@ -61,7 +58,7 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
           {like}
         </h1>
       </div>
-      <div className="pl-2">
+      <div className="pl-2" style={{ maxWidth: '600px' }}>
         <h1 className="text-left text-24 text-regular font-bold">{title}</h1>
         <p className="text-left text-18 opacity-40 text-regular font-bold">{description}</p>
       </div>

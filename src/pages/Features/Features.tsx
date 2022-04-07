@@ -91,15 +91,15 @@ const Features = () => {
   return (
     <div className="font-mono text-center">
       <div
+        className="submit-window"
         style={{
           width: '455px',
           height: '180px',
           backgroundColor: '#323232',
           position: 'fixed',
-          right: '0px',
         }}
       >
-        <div className="p-5">
+        <div className="p-5 d-none">
           <p
             className="text-left"
             style={{
@@ -122,7 +122,6 @@ const Features = () => {
           </div>
         </div>
       </div>
-
       <div id="here"></div>
     </div>
   )

@@ -84,6 +84,7 @@ const ModalComponent = (props: CardProps) => {
       <Modal visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <p className="pt-5 pl-2">TITLE</p>
         <Input
+          maxLength={45}
           id="featureTitle"
           placeholder="Short, descriptive title"
           onChange={e => {
