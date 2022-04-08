@@ -51,7 +51,14 @@ const Features = () => {
     }
     features.sort(compare)
 
-    const listItems = features.map(number => (
+    const filteredFeatureArray = features.filter(function (item) {
+      if (item.attributes.isDisplayed) {
+        return true
+      }
+      return false
+    })
+
+    const listItems = filteredFeatureArray.map(number => (
       <li>
         <FeatureCard
           parentMethod={() => likeFeature(number.id)}
@@ -113,12 +120,7 @@ const Features = () => {
             What new features would you like to see for Mixsome?
           </p>
           <div className="pt-3">
-            <ModalComponent
-              parentMethod={async x => {
-                getAllFeatures(x)
-                return x.id
-              }}
-            ></ModalComponent>
+            <ModalComponent></ModalComponent>
           </div>
         </div>
       </div>

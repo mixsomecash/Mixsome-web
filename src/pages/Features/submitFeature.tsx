@@ -4,12 +4,7 @@ import { useMoralis } from 'react-moralis'
 
 const { TextArea } = Input
 
-interface CardProps {
-  parentMethod(string): Promise<number>
-}
-
-const ModalComponent = (props: CardProps) => {
-  const { parentMethod } = props
+const ModalComponent = props => {
   const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [titleValue, setTitleValue] = useState('')
@@ -33,9 +28,11 @@ const ModalComponent = (props: CardProps) => {
       feature.set('description', featureDescription)
       feature.set('contributor', account)
       feature.set('likes', 1)
+      feature.set('isDisplayed', false)
       feature.addUnique('supporters', account)
       const storageObject = await feature.save()
       setIsModalVisible(false)
+      message.info('Your feature was submitted for review')
       return { id: storageObject.id, title: featureTitle, description: featureDescription }
     }
     alert('Connect wallet to submit your feature')
@@ -44,7 +41,6 @@ const ModalComponent = (props: CardProps) => {
 
   const handleOk = async () => {
     const returnedStoredObject = await addFeature()
-    parentMethod(returnedStoredObject)
   }
 
   const handleCancel = () => {
