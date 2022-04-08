@@ -223,3 +223,15 @@ tbody td {
   }
 }
 
+
+.ant-btn-primary{
+  background-color: #6EEB7E;
+  color: black;
+  outline: none;
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background-color: #7DFA8D;
+  color: black;
+}
