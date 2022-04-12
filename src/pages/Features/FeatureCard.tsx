@@ -41,7 +41,7 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
           borderRadius: '4px',
         }}
       >
-        <CaretUpOutlined className="pt-1 opacity-40" style={{ fontSize: '24px' }}></CaretUpOutlined>
+        <CaretUpOutlined className="pt-1 opacity-40" style={{ fontSize: '24px' }} />
         <h1
           style={{
             fontFamily: 'DM Sans',
@@ -49,11 +49,10 @@ export const FeatureCard: React.FC<CardProps> = (props: CardProps) => {
             lineHeight: '34px',
             height: '35px',
             fontStyle: 'normal',
-            letterSpacing: ' -0.01em',
-
+            letterSpacing: '-0.01em',
             fontWeight: 500,
           }}
-          className="text-center font-bold "
+          className="text-center font-bold"
         >
           {like}
         </h1>

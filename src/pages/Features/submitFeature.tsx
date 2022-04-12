@@ -33,14 +33,11 @@ const ModalComponent = props => {
       const storageObject = await feature.save()
       setIsModalVisible(false)
       message.info('Your feature was submitted for review')
-      return { id: storageObject.id, title: featureTitle, description: featureDescription }
     }
-    alert('Connect wallet to submit your feature')
-    return undefined
   }
 
   const handleOk = async () => {
-    const returnedStoredObject = await addFeature()
+    await addFeature()
   }
 
   const handleCancel = () => {
@@ -57,22 +54,7 @@ const ModalComponent = props => {
           onKeyDown={() => {
             return null
           }}
-          className="text-right"
-          style={{
-            display: 'inline-flex',
-            float: 'left',
-            padding: '0px 30px 0px 30px',
-            height: '63px',
-            borderStyle: 'none',
-            backgroundColor: '#6EEB7E',
-            color: '#000000',
-            fontFamily: 'DM Sans',
-            lineHeight: '60px',
-            fontSize: '18px',
-            fontStyle: 'normal',
-            letterSpacing: ' -0.01em',
-            fontWeight: 500,
-          }}
+          className="btn-propose"
         >
           <h1>Propose a Feature</h1>
         </div>
