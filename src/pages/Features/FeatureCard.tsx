@@ -1,5 +1,4 @@
-import React, { Component, useState, useEffect } from 'react'
-import { useMoralis } from 'react-moralis'
+import React, { useState, useEffect } from 'react'
 import { CaretUpOutlined } from '@ant-design/icons'
 
 interface CardProps {

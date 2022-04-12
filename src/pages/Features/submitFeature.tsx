@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Modal, Button, Input, message } from 'antd'
+import { useState } from 'react'
+import { Modal, Input, message } from 'antd'
 import { useMoralis } from 'react-moralis'
 
 const { TextArea } = Input
@@ -30,7 +30,7 @@ const ModalComponent = props => {
       feature.set('likes', 1)
       feature.set('isDisplayed', false)
       feature.addUnique('supporters', account)
-      const storageObject = await feature.save()
+      await feature.save()
       setIsModalVisible(false)
       message.info('Your feature was submitted for review')
     }
