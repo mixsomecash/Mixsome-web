@@ -8,9 +8,9 @@ const useChain = () => {
   const switchNetwork = async (chainIdString: string) => {
     try {
       if (!isWeb3Enabled) {
-        await Moralis.Web3.enableWeb3()
+        await Moralis.enableWeb3()
       }
-      await Moralis.Web3.switchNetwork(chainIdString)
+      await Moralis.switchNetwork(chainIdString)
       window.location.reload()
     } catch (switchError: any) {
       if (switchError.code === CHAIN_DOES_NOT_EXIST_ERROR_CODE) {

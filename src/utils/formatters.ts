@@ -21,7 +21,7 @@ export const tokenValue = (value, decimals) => (decimals ? value / 10 ** decimal
 
 export const tokenValueTxt = (value, decimals, symbol) =>
   `${n4.format(tokenValue(value, decimals))} ${symbol}`
-
+  
 export const getEllipsisText = (str: string, n = 6) => {
   if (str) {
     return `${str.slice(0, n)}...${str.slice(str.length - n)}`
