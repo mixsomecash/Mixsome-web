@@ -62,6 +62,7 @@ const Sidebar: React.FC = () => {
           {renderLink('Bridge ', '#', 'bridge')}
           {renderLink('Flows', '/', 'flows')}
           {renderLink('DEX', '/1inch', 'dex')}
+          {renderLink('Feature Requests', '/features', 'features')}
         </Menu>
         <div className="hidden lg:block mt-auto mx-5 mb-32 pb-5">
           <Menu mode="horizontal">

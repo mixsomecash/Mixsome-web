@@ -201,3 +201,52 @@ tbody td {
 .chart__container {
   height: 350px
 }
+
+.submit-window {
+  width: 455px;
+  right: 0px ;
+  position: 'fixed' !important;
+}
+
+.feature-text{
+  max-width: 600px;
+}
+
+
+@media only screen and (max-width: 768px) { 
+  .submit-window {
+    width: 100%;
+    position: relative !important;
+  }
+  .feature-text{
+    width: 85%;
+  }
+}
+
+.ant-btn-primary{
+  background-color: #6EEB7E;
+  color: black;
+  outline: none;
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background-color: #7DFA8D;
+  color: black;
+}
+
+.btn-propose{
+  display: inline-flex;
+  float: left;
+  padding: 0px 30px 0px 30px;
+  height: 63px;
+  border-style: none;
+  background-color: #6EEB7E;
+  color: #000000;
+  font-family: DM Sans;
+  line-height: 60px;
+  font-size: 18px;
+  font-style: normal;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+}
