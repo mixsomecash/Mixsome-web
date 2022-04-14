@@ -4,6 +4,7 @@ import { MoralisProvider } from 'react-moralis'
 import { Navigation, Sidebar } from 'components'
 import { Dex, Main, Flow, Dashboard, Page404, Pools } from 'pages'
 import { config } from 'config'
+import KnowledgeSharing from 'pages/KnowledgeSharing'
 
 const App = () => {
   const renderWrongConfiguration = () => {
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/dashboard" component={Dashboard} exact />
             <Route path="/flows/:id" component={Flow} exact />
             <Route path="/1inch" component={Dex} exact />
+            <Route path="/knowledge-sharing" component={KnowledgeSharing} exact />
             <Route component={Page404} />
           </Switch>
         </div>
