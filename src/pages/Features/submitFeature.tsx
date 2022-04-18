@@ -5,7 +5,7 @@ import { useMoralis } from 'react-moralis'
 const { TextArea } = Input
 
 const ModalComponent = props => {
-  const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
+  const { Moralis, account } = useMoralis()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [titleValue, setTitleValue] = useState('')
   const [descriptionValue, setDescriptionValue] = useState('')
