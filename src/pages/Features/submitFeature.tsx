@@ -6,7 +6,7 @@ import { useSubmitFeature } from 'hooks/useSubmitFeature'
 const { TextArea } = Input
 
 const ModalComponent = props => {
-  const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
+  const { account } = useMoralis()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [titleValue, setTitleValue] = useState('')
   const [descriptionValue, setDescriptionValue] = useState('')
