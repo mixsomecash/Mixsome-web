@@ -5,7 +5,7 @@ import { FeatureCard } from './FeatureCard'
 import ModalComponent from './submitFeature'
 
 const Features = () => {
-  const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
+  const { Moralis, isInitialized, account } = useMoralis()
   const [filteredFeatures, setFilteredFeatures] = useState<any[]>([])
 
   async function likeFeature(id) {
