@@ -1,10 +1,4 @@
-import { useEffect, useState } from 'react'
 import { useMoralis } from 'react-moralis'
-
-type TokenDetails = {
-  name: string
-  symbol: string
-}
 
 export const useSubmitFeature = () => {
   const { Moralis, account } = useMoralis()
