@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { Modal, Input, message } from 'antd'
 import { useMoralis } from 'react-moralis'
+import { useSubmitFeature } from 'hooks/useSubmitFeature'
 
 const { TextArea } = Input
 
 const ModalComponent = props => {
-  const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
+  const { account } = useMoralis()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [titleValue, setTitleValue] = useState('')
   const [descriptionValue, setDescriptionValue] = useState('')
+  const { approve } = useSubmitFeature()
 
   const showModal = () => {
     if (account) {
@@ -20,17 +22,7 @@ const ModalComponent = props => {
 
   const addFeature = async () => {
     if (account != null) {
-      const FeatureObject = await Moralis.Object.extend('Feature')
-      const feature = new FeatureObject()
-      const featureTitle = titleValue
-      const featureDescription = descriptionValue
-      feature.set('title', featureTitle)
-      feature.set('description', featureDescription)
-      feature.set('contributor', account)
-      feature.set('likes', 1)
-      feature.set('isDisplayed', false)
-      feature.addUnique('supporters', account)
-      await feature.save()
+      approve(titleValue, descriptionValue)
       setIsModalVisible(false)
       message.info('Your feature was submitted for review')
     }

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { message } from 'antd'
 import { useMoralis } from 'react-moralis'
 import { FeatureCard } from './FeatureCard'
 import ModalComponent from './submitFeature'
 
 const Features = () => {
-  const { Moralis, isInitialized, account, isAuthenticated } = useMoralis()
-  const [featureCards, setFeatureCards] = useState(<></>)
+  const { Moralis, isInitialized, account } = useMoralis()
+  const [filteredFeatures, setFilteredFeatures] = useState<any[]>([])
 
   async function likeFeature(id) {
     const FeatureObject = await Moralis.Object.extend('Feature')
@@ -34,7 +34,7 @@ const Features = () => {
     return JSON.stringify(response)
   }
 
-  const getAllFeatures = async newAdded => {
+  const getAllFeatures = useCallback(async () => {
     if (!isInitialized) return
     const query = await new Moralis.Query('Feature')
     const features = await query.find()
@@ -57,23 +57,12 @@ const Features = () => {
       return false
     })
 
-    const listItems = filteredFeatureArray.map(number => (
-      <li key={number.id}>
-        <FeatureCard
-          parentMethod={() => likeFeature(number.id)}
-          title={number.attributes.title}
-          likes={number.attributes.likes}
-          isLiked={number.attributes.supporters.includes(account)}
-          description={number.attributes.description}
-        />
-      </li>
-    ))
-    setFeatureCards(<ul>{listItems}</ul>)
-  }
+    setFilteredFeatures(filteredFeatureArray)
+  }, [Moralis, isInitialized])
 
   useEffect(() => {
-    getAllFeatures(undefined)
-  })
+    getAllFeatures()
+  }, [getAllFeatures])
 
   return (
     <div className="font-mono text-center">
@@ -104,7 +93,22 @@ const Features = () => {
           </div>
         </div>
       </div>
-      <div id="here">{featureCards}</div>
+      <div id="here">
+        <ul>
+          {filteredFeatures &&
+            filteredFeatures.map(number => (
+              <li key={number.id}>
+                <FeatureCard
+                  parentMethod={() => likeFeature(number.id)}
+                  title={number.attributes.title}
+                  likes={number.attributes.likes}
+                  isLiked={number.attributes.supporters.includes(account)}
+                  description={number.attributes.description}
+                />
+              </li>
+            ))}
+        </ul>
+      </div>
     </div>
   )
 }
