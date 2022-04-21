@@ -36,6 +36,7 @@
     "chart.js": "^3.6.1",
     "classnames": "^2.3.1",
     "ethers": "^5.1.0",
+    "js-sha3": "^0.8.0",
     "moralis": "^1.5.5",
     "react": "^17.0.1",
     "react-blockies": "^1.4.1",

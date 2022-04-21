@@ -1,8 +1,10 @@
 {
     "cSpell.words": [
+        "antd",
         "Blockie",
         "blockies",
         "Defi",
         "Mixsome"
-    ]
+    ],
+    "eslint.codeActionsOnSave.mode": "all"
 }
