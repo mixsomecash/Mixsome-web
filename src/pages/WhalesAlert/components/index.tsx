@@ -32,7 +32,8 @@ const WhalesAlert: React.FC = () => {
       syncHistorical,
     }
     const result = await Moralis.Cloud.run('whales_alert', params)
-    if (result.error) setError(result.error)
+    if (result?.backendError) setError(result.message)
+    console.log(result)
   }
 
   const reset = () => {
