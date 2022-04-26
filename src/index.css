@@ -250,3 +250,36 @@ tbody td {
   letter-spacing: -0.01em;
   font-weight: 500;
 }
+
+/* Whales alert styles.. */
+.whales-alert-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;;
+}
+
+.whales-alert-wrapper div {
+  margin-bottom: 12px;
+}
+
+.whales-alert-wrapper p {
+  margin-bottom: 6px;
+}
+
+.whales-alert-address-input {
+  width: 400px;
+}
+
+.whales-alert-selector {
+  width: 120px;
+}
+
+.whales-alert-buttons-box {
+  width: 160px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.whales-alert-error {
+  color: red;
+}

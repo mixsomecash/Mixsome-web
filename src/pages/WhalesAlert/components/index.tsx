@@ -1,60 +1,60 @@
 import React, { useState } from 'react'
 import { useMoralis } from 'react-moralis'
-import { Typography, Input, Button, Row, Col, Divider, Space } from 'antd'
 // import validate from '../../../utils/Validate'
 
-const { Title } = Typography
+import { WhalesAlertTitle } from './Title'
+import { Address } from './Address'
+import { AlertMethod } from './AlertMethod'
+import { Error } from './Error'
+import { ActionControls } from './ActionControls'
 
 const WhalesAlert: React.FC = () => {
-  const [address, setAddress] = useState<string>('')
-
-  const onChange = event => {
-    setAddress(event.target.value)
-  }
-
   const { Moralis } = useMoralis()
 
-  const validateAddress = async () => {
-    console.log(address)
+  const [address, setAddress] = useState<string>('')
+  const [alertMethod, setAlertMethod] = useState<string>('telegram')
+  const [error, setError] = useState<string>('')
+
+  const submitButtonDisabled = address === ''
+  const resetButtonDisabled = address === '' && alertMethod === 'telegram'
+
+  const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setAddress(event.target.value)
+  const handleAlertMethodChange = (value: string) => setAlertMethod(value)
+
+  const submit = async () => {
     const params = {
-      republic: 'Tuva',
-      capital: 'Kyzyl',
+      address,
+      alertMethod,
     }
     const result = await Moralis.Cloud.run('whales_alert', params)
-    console.log(result)
+    if (result.error) setError(result.error)
+  }
+
+  const reset = () => {
+    setAddress('')
+    setAlertMethod('telegram')
+    setError('')
   }
 
   return (
     <>
-      <Row>
-        <Col span={24}>
-          <Title level={3}>Whales Alert</Title>
-        </Col>
-      </Row>
+      <WhalesAlertTitle />
 
-      <Row>
-        <Col span={24}>
-          <Input
-            value={address}
-            onChange={onChange}
-            type="text"
-            placeholder="Enter the address you want to watch.."
-          />
-        </Col>
-      </Row>
+      <div className="whales-alert-wrapper">
+        <Address address={address} onChange={handleAddressChange} />
 
-      <Divider />
+        <AlertMethod alertMethod={alertMethod} onChange={handleAlertMethodChange} />
 
-      <Row>
-        <Col span={24}>
-          <Space>
-            <Button onClick={validateAddress} type="primary">
-              Submit
-            </Button>
-            <Button>Reset</Button>
-          </Space>
-        </Col>
-      </Row>
+        {error && <Error error={error} />}
+
+        <ActionControls
+          submitButtonDisabled={submitButtonDisabled}
+          resetButtonDisabled={resetButtonDisabled}
+          submit={submit}
+          reset={reset}
+        />
+      </div>
     </>
   )
 }
