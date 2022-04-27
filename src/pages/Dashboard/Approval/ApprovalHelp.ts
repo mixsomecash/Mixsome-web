@@ -1,11 +1,51 @@
-import { notification } from 'antd'
 import { Moralis } from 'moralis'
 import { ChainId } from 'types/moralis'
-import { AllowanceDto, ApprovalTransactions } from './types'
+import tokenAbi from 'utils/ERC20.json'
+import Web3 from 'web3'
+import { AbiItem } from 'web3-utils'
+import { ApprovalTransactions, TokenMetadata } from './types'
 
-const APPROVE = 'approve'
+const APPROVE_SHA3 = '0x095ea7b3'
+const MAX_APPROVAL_AMOUNT = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+const MIN_APPROVAL_AMOUNT = '0000000000000000000000000000000000000000000000000000000000000000'
 
-const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
+// const SIGNATURES_URL = 'https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/'
+
+const calculateAllowance = (allowance: string, decimals: string) => {
+  return allowance === MAX_APPROVAL_AMOUNT
+    ? 'Unlimited'
+    : Moralis.Units.FromWei(Web3.utils.hexToNumberString(`0x${allowance}`), parseInt(decimals, 10))
+}
+
+const getTokenMetadata = async (
+  addresses: string[],
+  chainId: ChainId,
+): Promise<TokenMetadata[] | null> => {
+  try {
+    const metaDatas = await Moralis.Web3API.token.getTokenMetadata({
+      chain: chainId,
+      addresses,
+    })
+    return metaDatas
+  } catch (error) {
+    return null
+  }
+}
+
+const parseApproveInputData = (input_data: string) => {
+  if (input_data.length !== 138) {
+    return {
+      spenderAddress: 'N/A',
+      allowance: MIN_APPROVAL_AMOUNT,
+    }
+  }
+  // check every 256 bit after first 32 bit to see function inputs data
+  const amount = input_data.slice(10).slice(-64)
+  return {
+    spenderAddress: input_data.slice(10).slice(0, 64).slice(-40),
+    allowance: amount,
+  }
+}
 
 export const getApprovals = async (
   accountAddress: string,
@@ -21,96 +61,82 @@ export const getApprovals = async (
   if (!transactions?.result) {
     return null
   }
+
+  const addresses: string[] = []
+  const transactionsToShow: ApprovalTransactions[] = []
   const approvals = await Promise.all(
     transactions.result.map(async transaction => {
-      const signatureBytesString = transaction.input.substring(2, 10)
-      if (signatureBytesString.length !== 8) {
+      const signatureBytesString = transaction.input.substring(0, 10)
+      if (signatureBytesString !== APPROVE_SHA3) {
         return null
       }
 
-      const functionName = await getFunctionName(signatureBytesString)
+      const inputData = parseApproveInputData(transaction.input)
 
-      const native = await Moralis.Web3API.native.getTransaction({
-        chain: chainId,
-        transaction_hash: transaction.hash,
-      })
-      if (functionName !== APPROVE) {
-        return null
+      if (
+        transactionsToShow.findIndex(
+          t =>
+            t.spenderAddress === `0x${inputData?.spenderAddress}` &&
+            t.contractAddress === transaction.to_address,
+        ) === -1
+      ) {
+        const txn: ApprovalTransactions = {
+          transactionHash: transaction.hash,
+          contractAddress: transaction.to_address,
+          timestamp: transaction.block_timestamp,
+          allowance: inputData.allowance,
+          spenderAddress: `0x${inputData?.spenderAddress}`,
+          metadata: null,
+        }
+        transactionsToShow.push(txn)
+        if (inputData.allowance !== MIN_APPROVAL_AMOUNT) addresses.push(transaction.to_address)
+        return txn
       }
-      console.log(native)
-
-      return {
-        transactionHash: transaction.hash,
-        contractAddress: transaction.to_address,
-        functionName,
-        timestamp: transaction.block_timestamp,
-        allowance: await getAllowance({
-          chainId,
-          ownerAddress: '0x' + native.logs[0]?.topic1?.slice(-40),
-          spenderAddress: '0x' + native.logs[0]?.topic2?.slice(-40),
-          contractAddress: native.logs[0]?.address,
-        }),
-      }
+      return null
     }),
   )
-  return approvals.filter(transaction => !!transaction) as ApprovalTransactions[]
-}
+  const metadatas = await getTokenMetadata(addresses, chainId)
 
-const getAllowance = async (allowanceDto: AllowanceDto) => {
-  try {
-    const { allowance } = await Moralis.Web3API.token.getTokenAllowance({
-      chain: allowanceDto.chainId,
-      owner_address: allowanceDto.ownerAddress,
-      spender_address: allowanceDto.spenderAddress,
-      address: allowanceDto.contractAddress,
+  return approvals
+    .map(transaction => {
+      const myMetadata = metadatas?.find(token => token.address === transaction?.contractAddress)
+      if (!myMetadata) {
+        return null
+      }
+      return {
+        ...transaction,
+        allowance: calculateAllowance(transaction?.allowance || '0', myMetadata?.decimals || '18'),
+        metadata: myMetadata,
+      }
     })
-    console.log('allowance', allowance)
-    return allowance
-  } catch (ignore) {
-    return null
-  }
+    .filter(transaction => !!transaction && transaction.allowance !== '0') as ApprovalTransactions[]
 }
 
-const getFunctionName = async (signatureBytesString): Promise<string | null> => {
-  try {
-    const signatureResponse = await fetch(`${SIGNATURES_URL}${signatureBytesString}`)
-    if (!signatureResponse.ok) {
-      return null
-    }
-    const signature = await signatureResponse.text()
-    const functionName = signature.split('(')[0]
-    return functionName
-  } catch (err) {
-    return null
-  }
-}
-
-export const revoke = async (
-  accountAddress: string | null,
-  contractAddress: string | null,
-  chainId: ChainId,
+export const revokeTokens = async (
+  contract_address: string,
+  spender_address: string,
+  cb: ({ isSuccess, message }) => void,
 ) => {
-  console.log('approve')
-  const { message, code } = await Moralis.Plugins.oneInch.approve({
-    chain: chainId,
-    fromAddress: accountAddress,
-    tokenAddress: contractAddress,
-  })
-  notification.info({
-    message: "Error",
-    description: message,
-  });
+  try {
+    await Moralis.executeFunction({
+      contractAddress: contract_address,
+      functionName: 'revoke',
+      params: {
+        spender_address,
+        amount: Moralis.Units.Token('0'),
+      },
+      abi: erc20Abi,
+    })
+    cb({
+      isSuccess: true,
+      message: 'The token has been revoked',
+    })
+    return true
+  } catch (err) {
+    cb({
+      isSuccess: false,
+      message: 'Somthing went wrong',
+    })
+    return false
+  }
 }
-
-// export const getTokenMetaData = (contractAddress: string, chainId: ChainId) => {
-//   try {
-//     return Moralis.Web3API.token
-//       .getTokenMetadata({
-//         chain: chainId,
-//         addresses: [contractAddress],
-//       })
-//       .then(metadatas => metadatas[0])
-//   } catch {
-//     return null
-//   }
-// }
