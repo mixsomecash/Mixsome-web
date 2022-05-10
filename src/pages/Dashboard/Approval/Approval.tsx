@@ -54,7 +54,7 @@ const Approval = () => {
 
   const handleRevokeLoading = (contractAddress, spenderAddress, transactionHash) => {
     setRevokeLoadings([...revokeLoadings, transactionHash])
-    revokeTokens(contractAddress, spenderAddress, account, async ({ isSuccess, message }) => {
+    revokeTokens(contractAddress, spenderAddress, async ({ isSuccess, message }) => {
       setRevokeLoadings(revokeLoadings.filter(item => item !== transactionHash))
       if (isSuccess) {
         setApprovalsChanged(Math.random())
