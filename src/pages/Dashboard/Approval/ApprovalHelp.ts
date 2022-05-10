@@ -1,8 +1,7 @@
 import { Moralis } from 'moralis'
 import { ChainId } from 'types/moralis'
-import tokenAbi from 'utils/ERC20.json'
+import erc20Abi from 'utils/ERC20.json'
 import Web3 from 'web3'
-import { AbiItem } from 'web3-utils'
 import { ApprovalTransactions, TokenMetadata } from './types'
 
 const APPROVE_SHA3 = '0x095ea7b3'
@@ -115,13 +114,18 @@ export const getApprovals = async (
 export const revokeTokens = async (
   contract_address: string,
   spender_address: string,
-  account: string | null,
   cb: ({ isSuccess, message }) => void,
 ) => {
   try {
-    const connector = await Moralis.Web3.enableWeb3()
-    const tokenContract = new connector.eth.Contract(tokenAbi as AbiItem[], contract_address)
-    await tokenContract.methods.approve(spender_address, '0').send({ from: account })
+    await Moralis.executeFunction({
+      contractAddress: contract_address,
+      functionName: 'revoke',
+      params: {
+        spender_address,
+        amount: Moralis.Units.Token('0'),
+      },
+      abi: erc20Abi,
+    })
     cb({
       isSuccess: true,
       message: 'The token has been revoked',
