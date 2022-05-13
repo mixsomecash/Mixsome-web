@@ -5,8 +5,9 @@ import { useMoralis } from 'react-moralis'
 import { WhalesAlertTitle } from './Title'
 import { Address } from './Address'
 import { AlertMethod } from './AlertMethod'
-import { SyncHistorical } from './SyncHistorical'
+import { PhoneNumber } from './PhoneNumber'
 import { Error } from './Error'
+import { Result } from './Result'
 import { ActionControls } from './ActionControls'
 
 const WhalesAlert: React.FC = () => {
@@ -14,33 +15,38 @@ const WhalesAlert: React.FC = () => {
 
   const [address, setAddress] = useState<string>('')
   const [alertMethod, setAlertMethod] = useState<string>('telegram')
-  const [syncHistorical, setSyncHistorical] = useState<boolean>(false)
+  const [phoneNumber, setPhoneNumber] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [result, setResult] = useState<string>('')
 
-  const submitButtonDisabled = address === ''
-  const resetButtonDisabled = address === '' && alertMethod === 'telegram' && !syncHistorical
+  const submitButtonDisabled = address === '' || phoneNumber === ''
+  const resetButtonDisabled = address === '' && alertMethod === 'telegram'
 
   const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) =>
     setAddress(event.target.value)
   const handleAlertMethodChange = (value: string) => setAlertMethod(value)
-  const handleSyncHistoricalChange = (value: boolean) => setSyncHistorical(value)
-
-  const submit = async () => {
-    const params = {
-      address,
-      alertMethod,
-      syncHistorical,
-    }
-    const result = await Moralis.Cloud.run('whales_alert', params)
-    if (result?.backendError) setError(result.message)
-    console.log(result)
-  }
+  const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setPhoneNumber(event.target.value)
 
   const reset = () => {
     setAddress('')
     setAlertMethod('telegram')
-    setSyncHistorical(false)
+    setPhoneNumber('')
     setError('')
+  }
+
+  const submit = async () => {
+    if (alertMethod !== 'telegram' || address === '' || phoneNumber === '') return
+    const params = {
+      address,
+      alertMethod,
+      phoneNumber,
+    }
+    const response = await Moralis.Cloud.run('whales_alert', params)
+    if (response?.backendError) setError(response.message)
+    setResult(response)
+    reset()
+    console.log(response)
   }
 
   return (
@@ -52,7 +58,9 @@ const WhalesAlert: React.FC = () => {
 
         <AlertMethod alertMethod={alertMethod} onChange={handleAlertMethodChange} />
 
-        <SyncHistorical value={syncHistorical} onChange={handleSyncHistoricalChange} />
+        <PhoneNumber phoneNumber={phoneNumber} onChange={handlePhoneNumberChange} />
+
+        {result && <Result result={result} />}
 
         {error && <Error error={error} />}
 

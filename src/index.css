@@ -283,3 +283,7 @@ tbody td {
 .whales-alert-error {
   color: red;
 }
+
+.whales-alert-result {
+  color: green;
+}
